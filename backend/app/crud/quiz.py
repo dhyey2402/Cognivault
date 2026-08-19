@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from app.models.quiz import Category, Quiz, Question, Option
-from app.schemas.quiz import CategoryCreate, QuizCreate, QuestionCreate
+from app.schemas.quiz import CategoryCreate, CategoryUpdate, QuizCreate, QuizUpdate, QuestionCreate, QuestionUpdate
 
 # Category CRUD
 def get_categories(db: Session, skip: int = 0, limit: int = 100):
@@ -11,6 +11,17 @@ def create_category(db: Session, category: CategoryCreate):
     db.add(db_category)
     db.commit()
     db.refresh(db_category)
+    return db_category
+
+def update_category(db: Session, category_id: int, category: CategoryUpdate):
+    db_category = db.query(Category).filter(Category.id == category_id).first()
+    if db_category:
+        update_data = category.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_category, key, value)
+        db.add(db_category)
+        db.commit()
+        db.refresh(db_category)
     return db_category
 
 # Quiz CRUD
@@ -43,7 +54,7 @@ def create_quiz(db: Session, quiz: QuizCreate):
     db.refresh(db_quiz)
     return db_quiz
 
-def update_quiz(db: Session, quiz_id: int, quiz: QuizCreate):
+def update_quiz(db: Session, quiz_id: int, quiz: QuizUpdate):
     db_quiz = db.query(Quiz).filter(Quiz.id == quiz_id).first()
     if db_quiz:
         update_data = quiz.model_dump(exclude_unset=True)
@@ -84,6 +95,17 @@ def create_question_with_options(db: Session, quiz_id: int, question: QuestionCr
     
     db.commit()
     db.refresh(db_question)
+    return db_question
+
+def update_question(db: Session, question_id: int, question: QuestionUpdate):
+    db_question = db.query(Question).filter(Question.id == question_id).first()
+    if db_question:
+        update_data = question.model_dump(exclude_unset=True)
+        for key, value in update_data.items():
+            setattr(db_question, key, value)
+        db.add(db_question)
+        db.commit()
+        db.refresh(db_question)
     return db_question
 
 def delete_question(db: Session, question_id: int):

@@ -40,9 +40,10 @@ export default function QuizBuilder() {
       marks: 1.0,
       difficulty: 'MEDIUM',
       explanation: '',
+      story_context: '',
       options: [
-        { text: '', is_correct: true },
-        { text: '', is_correct: false },
+        { text: '', is_correct: true, story_consequence: '' },
+        { text: '', is_correct: false, story_consequence: '' },
       ]
     };
   }
@@ -62,13 +63,19 @@ export default function QuizBuilder() {
     }
     setQuestionForm({
       ...questionForm,
-      options: [...questionForm.options, { text: '', is_correct: false }]
+      options: [...questionForm.options, { text: '', is_correct: false, story_consequence: '' }]
     });
   };
 
   const updateOptionText = (index, text) => {
     const newOptions = [...questionForm.options];
     newOptions[index].text = text;
+    setQuestionForm({ ...questionForm, options: newOptions });
+  };
+  
+  const updateOptionConsequence = (index, text) => {
+    const newOptions = [...questionForm.options];
+    newOptions[index].story_consequence = text;
     setQuestionForm({ ...questionForm, options: newOptions });
   };
 
@@ -135,7 +142,8 @@ export default function QuizBuilder() {
       marks: q.marks,
       difficulty: q.difficulty || 'MEDIUM',
       explanation: q.explanation || '',
-      options: q.options.map(opt => ({ text: opt.text, is_correct: opt.is_correct }))
+      story_context: q.story_context || '',
+      options: q.options.map(opt => ({ text: opt.text, is_correct: opt.is_correct, story_consequence: opt.story_consequence || '' }))
     });
   };
 
@@ -173,7 +181,24 @@ export default function QuizBuilder() {
         </div>
         
         <div className="pl-12">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{quiz?.title}</h1>
+          <div className="flex justify-between items-start">
+            <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{quiz?.title}</h1>
+            <button 
+              onClick={async () => {
+                const newMode = !quiz.is_story_mode;
+                await api.updateQuiz(quiz.id, { is_story_mode: newMode });
+                setQuiz({ ...quiz, is_story_mode: newMode });
+                toast.success(newMode ? 'Story Mode Enabled' : 'Story Mode Disabled');
+              }}
+              className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors border-2 ${
+                quiz?.is_story_mode 
+                  ? 'bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200'
+                  : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              ✨ {quiz?.is_story_mode ? 'Story Mode ON' : 'Story Mode OFF'}
+            </button>
+          </div>
           <div className="flex items-center gap-4 mt-3">
             <div className="flex items-center gap-1.5 text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">
               Join Code: <span className="font-mono text-slate-900 ml-1">{quiz?.join_code}</span>
@@ -212,6 +237,7 @@ export default function QuizBuilder() {
                     setFormData={setQuestionForm}
                     addOption={addOption}
                     updateOptionText={updateOptionText}
+                    updateOptionConsequence={updateOptionConsequence}
                     setCorrectOption={setCorrectOption}
                     removeOption={removeOption}
                     onCancel={() => setEditingQuestionId(null)}
@@ -301,6 +327,7 @@ export default function QuizBuilder() {
               setFormData={setQuestionForm}
               addOption={addOption}
               updateOptionText={updateOptionText}
+              updateOptionConsequence={updateOptionConsequence}
               setCorrectOption={setCorrectOption}
               removeOption={removeOption}
               onCancel={() => setIsAddingQuestion(false)}
@@ -315,7 +342,7 @@ export default function QuizBuilder() {
 }
 
 // Extracted Question Form Component for reuse
-function QuestionForm({ formData, setFormData, addOption, updateOptionText, setCorrectOption, removeOption, onCancel, onSave, isSaving }) {
+function QuestionForm({ formData, setFormData, addOption, updateOptionText, updateOptionConsequence, setCorrectOption, removeOption, onCancel, onSave, isSaving }) {
   return (
     <form onSubmit={onSave} className="space-y-6">
       <textarea
@@ -357,32 +384,41 @@ function QuestionForm({ formData, setFormData, addOption, updateOptionText, setC
       <div className="space-y-3">
         <label className="block text-xs font-bold text-slate-400 uppercase tracking-wide mb-2">Options</label>
         {formData.options.map((opt, index) => (
-          <div key={index} className={`flex items-center gap-3 p-2 rounded-xl border-2 transition-all ${opt.is_correct ? 'border-emerald-200 bg-emerald-50/50' : 'border-transparent hover:border-slate-200'}`}>
-            <button
-              type="button"
-              onClick={() => setCorrectOption(index)}
-              className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-                opt.is_correct ? 'bg-emerald-500 text-white shadow-sm ring-4 ring-emerald-100' : 'bg-slate-200 text-slate-400 hover:bg-slate-300'
-              }`}
-              title="Mark as correct answer"
-            >
-              <Check className="w-4 h-4" />
-            </button>
+          <div key={index} className={`flex flex-col gap-2 p-3 rounded-xl border-2 transition-all ${opt.is_correct ? 'border-emerald-200 bg-emerald-50/50' : 'border-transparent hover:border-slate-200'}`}>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => setCorrectOption(index)}
+                className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                  opt.is_correct ? 'bg-emerald-500 text-white shadow-sm ring-4 ring-emerald-100' : 'bg-slate-200 text-slate-400 hover:bg-slate-300'
+                }`}
+                title="Mark as correct answer"
+              >
+                <Check className="w-4 h-4" />
+              </button>
+              <input
+                type="text"
+                required
+                value={opt.text}
+                onChange={(e) => updateOptionText(index, e.target.value)}
+                placeholder={`Option ${index + 1}`}
+                className="flex-1 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-[var(--color-primary)] focus:ring-0 transition-colors font-medium text-slate-900"
+              />
+              <button
+                type="button"
+                onClick={() => removeOption(index)}
+                className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+            </div>
             <input
               type="text"
-              required
-              value={opt.text}
-              onChange={(e) => updateOptionText(index, e.target.value)}
-              placeholder={`Option ${index + 1}`}
-              className="flex-1 px-4 py-3 bg-white border-2 border-slate-200 rounded-xl focus:border-[var(--color-primary)] focus:ring-0 transition-colors font-medium text-slate-900"
+              value={opt.story_consequence || ''}
+              onChange={(e) => updateOptionConsequence(index, e.target.value)}
+              placeholder="Story consequence for this option..."
+              className="ml-11 px-4 py-2 text-sm bg-indigo-50 border-2 border-indigo-100 rounded-xl focus:border-indigo-300 focus:bg-white focus:ring-0 transition-colors font-medium text-indigo-900"
             />
-            <button
-              type="button"
-              onClick={() => removeOption(index)}
-              className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
           </div>
         ))}
         {formData.options.length < 6 && (
@@ -394,6 +430,17 @@ function QuestionForm({ formData, setFormData, addOption, updateOptionText, setC
             <Plus className="w-4 h-4" /> Add Option
           </button>
         )}
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-indigo-500 uppercase tracking-wide mb-2">Story Scenario (Optional)</label>
+        <textarea
+          value={formData.story_context || ''}
+          onChange={(e) => setFormData({ ...formData, story_context: e.target.value })}
+          placeholder="Set the narrative scene for this question..."
+          className="w-full px-4 py-3 bg-indigo-50 border-2 border-indigo-100 rounded-xl focus:bg-white focus:border-indigo-300 focus:ring-0 transition-colors font-medium text-indigo-900 resize-none"
+          rows="2"
+        />
       </div>
 
       <div>

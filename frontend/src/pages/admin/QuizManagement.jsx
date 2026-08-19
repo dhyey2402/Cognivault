@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
-import { Plus, Edit2, Trash2, BookOpen, Link as LinkIcon, Search, LayoutGrid, List, Clock, Copy, MoreHorizontal } from 'lucide-react';
+import { Plus, Edit2, Trash2, BookOpen, Link as LinkIcon, Search, LayoutGrid, List, Clock, Copy, MoreHorizontal, Globe, Globe2, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -112,6 +112,17 @@ export default function QuizManagement() {
       toast.success('Quiz deleted');
     } catch (err) {
       toast.error('Failed to delete quiz');
+    }
+  };
+
+  const handleTogglePublish = async (quiz) => {
+    const newStatus = quiz.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+    try {
+      await api.updateQuiz(quiz.id, { status: newStatus });
+      setQuizzes(quizzes.map(q => q.id === quiz.id ? { ...q, status: newStatus } : q));
+      toast.success(`Quiz ${newStatus.toLowerCase()}`);
+    } catch (err) {
+      toast.error('Failed to update quiz status');
     }
   };
 
@@ -239,6 +250,17 @@ export default function QuizManagement() {
                         </td>
                         <td className="px-6 py-4 text-right">
                           <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleTogglePublish(quiz)}
+                              className={`p-2 rounded-lg transition-colors font-medium text-sm flex items-center gap-1 ${
+                                quiz.status === 'PUBLISHED' 
+                                ? 'text-emerald-600 hover:bg-emerald-50' 
+                                : 'text-slate-400 hover:text-slate-700 hover:bg-slate-100'
+                              }`}
+                              title={quiz.status === 'PUBLISHED' ? "Unpublish Quiz" : "Publish Quiz"}
+                            >
+                              {quiz.status === 'PUBLISHED' ? <Globe2 className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                            </button>
                             <Link
                               to={`/admin/quizzes/${quiz.id}/builder`}
                               className="p-2 text-slate-400 hover:text-[var(--color-primary)] hover:bg-indigo-50 rounded-lg transition-colors font-medium text-sm flex items-center gap-1"
@@ -295,6 +317,17 @@ export default function QuizManagement() {
                         {quiz.join_code}
                       </div>
                       <div className="flex gap-1">
+                        <button
+                          onClick={() => handleTogglePublish(quiz)}
+                          className={`p-2 rounded-lg transition-colors ${
+                            quiz.status === 'PUBLISHED' 
+                            ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100' 
+                            : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-700'
+                          }`}
+                          title={quiz.status === 'PUBLISHED' ? "Unpublish Quiz" : "Publish Quiz"}
+                        >
+                          {quiz.status === 'PUBLISHED' ? <Globe2 className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
+                        </button>
                         <Link to={`/admin/quizzes/${quiz.id}/builder`} className="p-2 bg-indigo-50 text-[var(--color-primary)] rounded-lg hover:bg-[var(--color-primary)] hover:text-white transition-colors">
                           <Edit2 className="w-4 h-4" />
                         </Link>

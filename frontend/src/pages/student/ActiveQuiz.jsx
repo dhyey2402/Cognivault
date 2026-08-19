@@ -9,10 +9,14 @@ export default function ActiveQuiz() {
   const { quizId, attemptId } = useParams();
   const navigate = useNavigate();
   const [attempt, setAttempt] = useState(null);
+  const [quiz, setQuiz] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
   const [bookmarked, setBookmarked] = useState({});
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [questionStats, setQuestionStats] = useState({});
+  const [lastTick, setLastTick] = useState(Date.now());
+  const [showStoryConsequence, setShowStoryConsequence] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -23,8 +27,24 @@ export default function ActiveQuiz() {
   }, [attemptId]);
 
   useEffect(() => {
-    if (timeLeft > 0 && !isSubmitting) {
+    if (timeLeft > 0 && !isSubmitting && !showStoryConsequence) {
       const timer = setInterval(() => {
+        const now = Date.now();
+        const delta = Math.floor((now - lastTick) / 1000);
+        if (delta > 0) {
+           setLastTick(now);
+           if (questions[currentIndex]) {
+             const qId = questions[currentIndex].id;
+             setQuestionStats(prev => ({
+               ...prev,
+               [qId]: {
+                 timeSpent: (prev[qId]?.timeSpent || 0) + delta,
+                 changes: prev[qId]?.changes || 0
+               }
+             }));
+           }
+        }
+
         setTimeLeft((prev) => {
           if (prev <= 1) {
             clearInterval(timer);
@@ -36,7 +56,7 @@ export default function ActiveQuiz() {
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [timeLeft, isSubmitting]);
+  }, [timeLeft, isSubmitting, lastTick, currentIndex, questions, showStoryConsequence]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -54,13 +74,14 @@ export default function ActiveQuiz() {
 
   const fetchAttemptDetails = async () => {
     try {
-      const quiz = await api.getQuiz(quizId);
+      const quizDetails = await api.getQuiz(quizId);
       const attemptDetails = await api.getAttempt(attemptId);
       
-      setQuestions(quiz.questions || []);
+      setQuiz(quizDetails);
+      setQuestions(quizDetails.questions || []);
       setAttempt(attemptDetails);
       
-      const timeLimit = (quiz.duration_minutes || 30) * 60;
+      const timeLimit = (quizDetails.duration_minutes || 30) * 60;
       const startedAt = new Date(attemptDetails.started_at).getTime();
       const now = new Date().getTime();
       const elapsed = Math.floor((now - startedAt) / 1000);
@@ -85,7 +106,39 @@ export default function ActiveQuiz() {
   };
 
   const handleSelectOption = (questionId, optionId) => {
-    setAnswers(prev => ({ ...prev, [questionId]: optionId }));
+    setAnswers(prev => {
+      if (prev[questionId] !== optionId) {
+        setQuestionStats(stats => ({
+          ...stats,
+          [questionId]: {
+            ...stats[questionId],
+            changes: (stats[questionId]?.changes || 0) + (prev[questionId] ? 1 : 0),
+            timeSpent: stats[questionId]?.timeSpent || 0
+          }
+        }));
+      }
+      return { ...prev, [questionId]: optionId };
+    });
+  };
+
+  const handleNext = () => {
+    if (quiz?.is_story_mode && answers[currentQuestion.id]) {
+       setShowStoryConsequence(true);
+    } else {
+       setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1));
+       setLastTick(Date.now());
+    }
+  };
+  
+  const handlePrevious = () => {
+    setCurrentIndex(prev => Math.max(0, prev - 1));
+    setLastTick(Date.now());
+  };
+
+  const handleStoryContinue = () => {
+    setShowStoryConsequence(false);
+    setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1));
+    setLastTick(Date.now());
   };
 
   const toggleBookmark = (questionId) => {
@@ -103,10 +156,15 @@ export default function ActiveQuiz() {
     try {
       const answersList = Object.entries(answers).map(([qId, oId]) => ({
         question_id: parseInt(qId),
-        selected_option_id: oId
+        selected_option_id: oId,
+        time_spent_seconds: questionStats[qId]?.timeSpent || 0,
+        answer_changes: questionStats[qId]?.changes || 0
       }));
       
-      await api.submitAttempt(attemptId, answersList);
+      const timeLimit = (quiz?.duration_minutes || 30) * 60;
+      const timeTaken = timeLimit - timeLeft;
+
+      await api.submitAttempt(attemptId, { answers: answersList, time_taken: timeTaken });
       toast.success('Assessment submitted successfully!');
       navigate(`/results/${attemptId}`);
     } catch (err) {
@@ -168,7 +226,7 @@ export default function ActiveQuiz() {
                 {/* Question Header */}
                 <div className="flex justify-between items-start gap-4 mb-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-relaxed">
-                    {currentQuestion.text}
+                    {quiz?.is_story_mode ? 'Mission Objective' : currentQuestion.text}
                   </h2>
                   <button
                     onClick={() => toggleBookmark(currentQuestion.id)}
@@ -181,6 +239,13 @@ export default function ActiveQuiz() {
                     <Bookmark className="w-6 h-6" fill={bookmarked[currentQuestion.id] ? "currentColor" : "none"} />
                   </button>
                 </div>
+                
+                {quiz?.is_story_mode && currentQuestion.story_context && (
+                  <div className="mb-6 p-5 rounded-2xl bg-indigo-900 text-indigo-50 shadow-inner border border-indigo-700/50">
+                    <p className="text-lg leading-relaxed italic">{currentQuestion.story_context}</p>
+                    <p className="mt-4 font-bold text-indigo-200">Question: {currentQuestion.text}</p>
+                  </div>
+                )}
 
                 {/* Options */}
                 <div className="space-y-3 flex-1">
@@ -228,7 +293,7 @@ export default function ActiveQuiz() {
             {/* Navigation Footer */}
             <div className="p-6 border-t border-slate-100 flex items-center justify-between bg-white z-10">
               <button
-                onClick={() => setCurrentIndex(prev => Math.max(0, prev - 1))}
+                onClick={handlePrevious}
                 disabled={currentIndex === 0}
                 className="px-5 py-3 flex items-center gap-2 text-slate-500 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
               >
@@ -240,11 +305,11 @@ export default function ActiveQuiz() {
               </div>
 
               <button
-                onClick={() => setCurrentIndex(prev => Math.min(questions.length - 1, prev + 1))}
+                onClick={handleNext}
                 disabled={currentIndex === questions.length - 1}
                 className="px-6 py-3 flex items-center gap-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-30 shadow-sm"
               >
-                Next <ChevronRight className="w-5 h-5" />
+                {quiz?.is_story_mode && answers[currentQuestion.id] ? 'Proceed' : 'Next'} <ChevronRight className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -381,6 +446,42 @@ export default function ActiveQuiz() {
                   ) : (
                     'Submit Now'
                   )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {/* Story Consequence Modal */}
+      <AnimatePresence>
+        {showStoryConsequence && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/90 backdrop-blur-md"
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: -20, opacity: 0 }}
+              className="bg-indigo-950 rounded-3xl p-8 sm:p-12 max-w-2xl w-full shadow-[0_0_50px_rgba(79,70,229,0.3)] relative overflow-hidden text-center border border-indigo-500/30"
+            >
+              <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-transparent"></div>
+              
+              <div className="relative z-10">
+                <h2 className="text-3xl font-extrabold text-white mb-6">Consequence</h2>
+                
+                <div className="text-xl text-indigo-100 leading-relaxed mb-10 font-serif italic">
+                  {currentQuestion.options.find(o => o.id === answers[currentQuestion.id])?.story_consequence || 'Your action alters the course of the mission.'}
+                </div>
+
+                <button
+                  onClick={handleStoryContinue}
+                  className="px-8 py-4 bg-white text-indigo-950 font-black tracking-widest uppercase rounded-full hover:bg-indigo-50 transition-all shadow-glow"
+                >
+                  Continue Mission
                 </button>
               </div>
             </motion.div>

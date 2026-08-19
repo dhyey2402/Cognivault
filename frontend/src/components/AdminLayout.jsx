@@ -3,12 +3,15 @@ import { useAuth } from '../context/AuthContext';
 import { LayoutDashboard, Users, BookOpen, LogOut, Tags, BrainCircuit, ChevronLeft, ChevronRight, Settings, BarChart } from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import CommandGrid from './ui/CommandGrid';
 
 export default function AdminLayout() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  
+  const isAdminDashboard = location.pathname === '/admin';
 
   const handleLogout = () => {
     logout();
@@ -25,12 +28,16 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className="flex h-screen bg-[var(--color-background)] overflow-hidden">
+    <div className={`flex h-screen overflow-hidden ${isAdminDashboard ? 'text-white' : 'bg-[var(--color-background)]'}`}>
+      
+      {/* 3D Background specifically for dashboard */}
+      {isAdminDashboard && <CommandGrid />}
+
       {/* Sidebar */}
       <motion.aside 
         animate={{ width: isCollapsed ? 72 : 260 }}
         transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-        className="bg-[var(--color-background-dark)] text-slate-300 hidden md:flex md:flex-col relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.06)]"
+        className={`${isAdminDashboard ? 'bg-slate-950/80 backdrop-blur-xl border-r border-white/5 text-slate-300' : 'bg-[var(--color-background-dark)] text-slate-300'} hidden md:flex md:flex-col relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.06)]`}
       >
         <div className="h-[72px] flex items-center px-5 flex-shrink-0">
           <Link to="/admin" className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
@@ -142,8 +149,8 @@ export default function AdminLayout() {
       </motion.aside>
 
       {/* Mobile Header (Only visible on small screens) */}
-      <div className="md:hidden flex flex-col w-full h-full">
-        <header className="h-16 bg-[var(--color-background-dark)] flex items-center justify-between px-4 flex-shrink-0">
+      <div className="md:hidden flex flex-col w-full h-full relative z-10">
+        <header className={`${isAdminDashboard ? 'bg-slate-950/80 backdrop-blur-xl border-b border-white/10' : 'bg-[var(--color-background-dark)]'} h-16 flex items-center justify-between px-4 flex-shrink-0`}>
           <div className="flex items-center gap-2">
             <BrainCircuit className="w-6 h-6 text-[var(--color-primary-light)]" />
             <span className="text-lg font-bold text-white tracking-tight">Cognivault Admin</span>
@@ -163,14 +170,14 @@ export default function AdminLayout() {
       </div>
 
       {/* Desktop Main Content */}
-      <main className="flex-1 flex flex-col hidden md:flex h-full min-w-0">
-        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-8 flex-shrink-0 sticky top-0 z-10">
+      <main className="flex-1 flex flex-col hidden md:flex h-full min-w-0 relative z-10">
+        <header className={`h-16 flex items-center justify-between px-8 flex-shrink-0 sticky top-0 z-10 ${isAdminDashboard ? 'bg-transparent border-b border-white/5' : 'bg-white/80 backdrop-blur-md border-b border-slate-200/60'}`}>
            {/* Dynamic Breadcrumbs could go here based on route */}
-           <div className="flex items-center text-sm font-medium text-slate-500">
-             Admin <span className="mx-2 text-slate-300">/</span> <span className="text-slate-900 capitalize">{location.pathname.split('/').pop() || 'Dashboard'}</span>
+           <div className={`flex items-center text-sm font-medium ${isAdminDashboard ? 'text-slate-400' : 'text-slate-500'}`}>
+             Admin <span className={`mx-2 ${isAdminDashboard ? 'text-slate-600' : 'text-slate-300'}`}>/</span> <span className={`capitalize ${isAdminDashboard ? 'text-white' : 'text-slate-900'}`}>{location.pathname.split('/').pop() || 'Dashboard'}</span>
            </div>
         </header>
-        <div className="flex-1 p-8 overflow-y-auto overflow-x-hidden custom-scrollbar bg-[var(--color-background)]">
+        <div className={`flex-1 p-8 overflow-y-auto overflow-x-hidden custom-scrollbar ${isAdminDashboard ? 'bg-transparent' : 'bg-[var(--color-background)]'}`}>
           <Outlet />
         </div>
       </main>

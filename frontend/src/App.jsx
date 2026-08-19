@@ -20,6 +20,7 @@ import QuizListing from './pages/student/QuizListing';
 import QuizDetails from './pages/student/QuizDetails';
 import ActiveQuiz from './pages/student/ActiveQuiz';
 import QuizResult from './pages/student/QuizResult';
+import Leaderboard from './pages/student/Leaderboard';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
                 <Route path="/quizzes/:quizId/attempt/:attemptId" element={<ActiveQuiz />} />
                 <Route path="/join/:code" element={<JoinQuiz />} />
                 <Route path="/results/:attemptId" element={<QuizResult />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
               </Route>
             </Route>
 

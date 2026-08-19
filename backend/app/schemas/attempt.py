@@ -7,6 +7,8 @@ from app.schemas.quiz import QuizResponse, QuestionResponse, OptionResponse
 class AnswerBase(BaseModel):
     question_id: int
     selected_option_id: Optional[int] = None
+    time_spent_seconds: int = 0
+    answer_changes: int = 0
 
 class AnswerCreate(AnswerBase):
     pass
@@ -31,6 +33,18 @@ class AttemptUpdate(BaseModel):
     time_taken: Optional[int] = None
     status: Optional[AttemptStatus] = None
 
+class AttemptSubmit(BaseModel):
+    answers: List[AnswerCreate]
+    time_taken: int
+
+class StudentAnalytics(BaseModel):
+    total_attempts: int
+    passed_quizzes: int
+    average_score: float
+    highest_score: float
+    recent_attempts: list
+    performance_history: list
+
 class AttemptResponse(AttemptBase):
     id: int
     user_id: int
@@ -50,3 +64,34 @@ class AttemptResponse(AttemptBase):
 
 class AttemptDetailResponse(AttemptResponse):
     answers: List[AnswerResponse] = []
+
+class FocusDNA(BaseModel):
+    behavioral_profile: str
+    insights: List[str]
+    average_time_per_question: float
+    total_answer_changes: int
+    data_sufficient: bool
+
+class MemoryHeatmapQuestion(BaseModel):
+    question_id: int
+    question_text: str
+    is_correct: bool
+    time_spent_seconds: int
+    answer_changes: int
+    state: str # 'KNEW_IT', 'GUESSED', 'CHANGED', 'STRUGGLED', 'UNANSWERED'
+
+class MemoryHeatmap(BaseModel):
+    attempt_id: int
+    questions: List[MemoryHeatmapQuestion]
+    summary: dict
+
+class KnowledgeGalaxyCategory(BaseModel):
+    category_id: int
+    category_name: str
+    mastery_score: float # 0 to 100
+    total_attempts: int
+    completed_quizzes: int
+
+class KnowledgeGalaxy(BaseModel):
+    planets: List[KnowledgeGalaxyCategory]
+    total_stars: int

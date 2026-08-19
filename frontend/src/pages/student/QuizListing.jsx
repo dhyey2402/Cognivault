@@ -11,17 +11,20 @@ export default function QuizListing() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   
-  // Mock categories (in a real app, fetch from backend)
-  const categories = ['All', 'Programming', 'Mathematics', 'Science', 'History'];
+  const [dbCategories, setDbCategories] = useState([]);
 
   useEffect(() => {
-    fetchQuizzes();
+    fetchData();
   }, []);
 
-  const fetchQuizzes = async () => {
+  const fetchData = async () => {
     try {
-      const data = await api.getQuizzes();
-      setQuizzes(data);
+      const [quizzesData, categoriesData] = await Promise.all([
+        api.getQuizzes(),
+        api.getCategories()
+      ]);
+      setQuizzes(quizzesData.filter(q => q.status === 'PUBLISHED'));
+      setDbCategories([{ id: 'all', name: 'All' }, ...categoriesData]);
     } catch (err) {
       console.error(err);
     } finally {
@@ -42,10 +45,11 @@ export default function QuizListing() {
     }
   };
 
-  const filteredQuizzes = quizzes.filter(quiz => 
-    quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    quiz.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredQuizzes = quizzes.filter(quiz => {
+    const matchesSearch = quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) || quiz.description?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || quiz.category?.name === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-8 animate-fade-in pb-12">
@@ -75,17 +79,17 @@ export default function QuizListing() {
 
       {/* Category Pills */}
       <div className="flex overflow-x-auto pb-2 gap-2 custom-scrollbar">
-        {categories.map((cat) => (
+        {dbCategories.map((cat) => (
           <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
+            key={cat.id}
+            onClick={() => setSelectedCategory(cat.name)}
             className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
-              selectedCategory === cat
+              selectedCategory === cat.name
                 ? 'bg-[var(--color-primary-dark)] text-white shadow-md shadow-indigo-200'
                 : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
             }`}
           >
-            {cat}
+            {cat.name}
           </button>
         ))}
       </div>
@@ -144,7 +148,7 @@ export default function QuizListing() {
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
                       <Folder className="w-4 h-4" />
-                      PROGRAMMING
+                      {quiz.category?.name?.toUpperCase() || 'UNCATEGORIZED'}
                     </div>
                     <Link
                       to={`/quizzes/${quiz.id}`}

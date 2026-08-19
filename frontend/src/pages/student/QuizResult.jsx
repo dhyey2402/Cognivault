@@ -7,6 +7,8 @@ import { motion } from 'framer-motion';
 export default function QuizResult() {
   const { attemptId } = useParams();
   const [result, setResult] = useState(null);
+  const [dna, setDna] = useState(null);
+  const [heatmap, setHeatmap] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [animatedScore, setAnimatedScore] = useState(0);
 
@@ -16,8 +18,14 @@ export default function QuizResult() {
 
   const fetchResult = async () => {
     try {
-      const data = await api.getAttemptResult(attemptId);
+      const [data, dnaData, heatmapData] = await Promise.all([
+        api.getAttemptResult(attemptId),
+        api.getFocusDNA(attemptId).catch(() => null),
+        api.getMemoryHeatmap(attemptId).catch(() => null)
+      ]);
       setResult(data);
+      if (dnaData) setDna(dnaData);
+      if (heatmapData) setHeatmap(heatmapData);
       // Animate score count up
       const duration = 1500;
       const steps = 60;
@@ -158,6 +166,84 @@ export default function QuizResult() {
           </div>
         </div>
       </motion.div>
+
+      {/* Focus DNA & Memory Heatmap Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-8">
+        {/* Focus DNA */}
+        {dna && (
+          <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Focus DNA</h3>
+            </div>
+            
+            <div className="text-center mb-6">
+              <div className="inline-block px-4 py-1.5 rounded-full bg-purple-50 text-purple-700 font-black tracking-wide uppercase text-sm border border-purple-100 mb-3">
+                {dna.behavioral_profile}
+              </div>
+              <p className="text-slate-600 font-medium">
+                {dna.insights[0] || "We are analyzing your learning pattern."}
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-100">
+              <div className="text-center">
+                <div className="text-2xl font-black text-slate-800">{Math.round(dna.average_time_per_question)}s</div>
+                <div className="text-xs font-bold text-slate-400 uppercase">Avg Time/Q</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-black text-slate-800">{dna.total_answer_changes}</div>
+                <div className="text-xs font-bold text-slate-400 uppercase">Total Changes</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+
+        {/* Memory Heatmap */}
+        {heatmap && (
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="bg-white rounded-3xl shadow-sm border border-slate-200 p-8 flex flex-col">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+              </div>
+              <h3 className="text-xl font-bold text-slate-900">Memory Heatmap</h3>
+            </div>
+            
+            <div className="flex-1 flex items-center justify-center">
+              <div className="flex flex-wrap gap-2 justify-center">
+                {heatmap.questions.map((q, i) => {
+                   let bgColor = 'bg-slate-200';
+                   let textColor = 'text-white';
+                   if (q.state === 'KNEW_IT') bgColor = 'bg-emerald-500';
+                   if (q.state === 'GUESSED') bgColor = 'bg-emerald-300';
+                   if (q.state === 'CHANGED') bgColor = 'bg-amber-400';
+                   if (q.state === 'STRUGGLED') bgColor = 'bg-red-500';
+                   if (q.state === 'UNANSWERED') { bgColor = 'bg-slate-100 border border-slate-300'; textColor = 'text-slate-400'; }
+                   
+                   return (
+                     <div key={q.question_id} className={`w-8 h-8 rounded-md ${bgColor} flex items-center justify-center text-xs font-bold ${textColor} shadow-sm relative group cursor-pointer`}>
+                       {i + 1}
+                       {/* Tooltip */}
+                       <div className="absolute bottom-full mb-2 bg-slate-800 text-white text-xs p-2 rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-10 transition-opacity">
+                         {q.state.replace('_', ' ')} • {q.time_spent_seconds}s
+                       </div>
+                     </div>
+                   );
+                })}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-6 pt-4 border-t border-slate-100 text-xs font-bold text-slate-500 text-center">
+              <div><div className="w-3 h-3 bg-emerald-500 rounded-sm mx-auto mb-1"></div>Knew it</div>
+              <div><div className="w-3 h-3 bg-emerald-300 rounded-sm mx-auto mb-1"></div>Guessed</div>
+              <div><div className="w-3 h-3 bg-amber-400 rounded-sm mx-auto mb-1"></div>Changed</div>
+              <div><div className="w-3 h-3 bg-red-500 rounded-sm mx-auto mb-1"></div>Struggled</div>
+            </div>
+          </motion.div>
+        )}
+      </div>
 
       {/* Answer Review */}
       <div className="space-y-6">

@@ -42,6 +42,7 @@ class Quiz(Base):
     passing_score = Column(Float) # percentage
     max_attempts = Column(Integer, default=1)
     status = Column(SQLEnum(QuizStatus), default=QuizStatus.DRAFT)
+    is_story_mode = Column(Boolean, default=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -58,6 +59,7 @@ class Question(Base):
     marks = Column(Float, default=1.0)
     explanation = Column(Text)
     difficulty = Column(SQLEnum(DifficultyLevel), default=DifficultyLevel.MEDIUM)
+    story_context = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     quiz = relationship("Quiz", back_populates="questions")
@@ -70,6 +72,7 @@ class Option(Base):
     question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"))
     option_text = Column(Text, nullable=False)
     is_correct = Column(Boolean, default=False)
+    story_consequence = Column(Text, nullable=True)
 
     question = relationship("Question", back_populates="options")
 
@@ -101,6 +104,8 @@ class Answer(Base):
     question_id = Column(Integer, ForeignKey("questions.id", ondelete="CASCADE"))
     selected_option_id = Column(Integer, ForeignKey("options.id", ondelete="CASCADE"), nullable=True)
     is_correct = Column(Boolean, default=False)
+    time_spent_seconds = Column(Integer, default=0)
+    answer_changes = Column(Integer, default=0)
 
     attempt = relationship("Attempt", back_populates="answers")
     question = relationship("Question")

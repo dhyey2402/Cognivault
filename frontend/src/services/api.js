@@ -1,43 +1,9 @@
 import axiosInstance from '../lib/api';
 
 export const api = {
-  // Student Dashboard
   getStudentDashboard: async () => {
-    const response = await axiosInstance.get('/attempts/');
-    const attempts = response.data || [];
-    
-    // Calculate stats
-    const total_attempts = attempts.length;
-    const highest_score = attempts.length > 0 ? Math.max(...attempts.map(a => a.percentage)) : 0;
-    const passed_quizzes = attempts.filter(a => a.status === 'PASSED').length;
-    const average_score = attempts.length > 0 
-      ? Math.round(attempts.reduce((acc, a) => acc + a.percentage, 0) / attempts.length) 
-      : 0;
-
-    const recent_attempts = [...attempts]
-      .sort((a, b) => new Date(b.started_at) - new Date(a.started_at))
-      .slice(0, 5)
-      .map(a => ({
-        ...a,
-        quiz_title: a.quiz?.title || 'Unknown Quiz',
-        passing_score: a.quiz?.passing_score || 50
-      }));
-
-    const performance_history = [...attempts]
-      .sort((a, b) => new Date(a.started_at) - new Date(b.started_at))
-      .map(a => ({
-        title: a.quiz?.title || 'Quiz',
-        percentage: a.percentage
-      }));
-
-    return {
-      total_attempts,
-      average_score,
-      highest_score,
-      passed_quizzes,
-      recent_attempts,
-      performance_history
-    };
+    const response = await axiosInstance.get('/attempts/analytics');
+    return response.data;
   },
 
   // Admin Dashboard
@@ -110,29 +76,53 @@ export const api = {
     return response.data;
   },
   updateQuestion: async (questionId, data) => {
-    const response = await axiosInstance.put(`/questions/${questionId}`, data);
+    const response = await axiosInstance.put(`/quizzes/questions/${questionId}`, data);
     return response.data;
   },
   deleteQuestion: async (questionId) => {
-    const response = await axiosInstance.delete(`/questions/${questionId}`);
+    const response = await axiosInstance.delete(`/quizzes/questions/${questionId}`);
     return response.data;
   },
 
-  // Attempts
   startAttempt: async (quizId) => {
-    const response = await axiosInstance.post(`/quizzes/${quizId}/attempts`);
+    const response = await axiosInstance.post('/attempts/start', { quiz_id: quizId });
+    return response.data;
+  },
+  getAttempts: async () => {
+    const response = await axiosInstance.get('/attempts/');
     return response.data;
   },
   getAttempt: async (attemptId) => {
     const response = await axiosInstance.get(`/attempts/${attemptId}`);
     return response.data;
   },
-  submitAttempt: async (attemptId, answers) => {
-    const response = await axiosInstance.post(`/attempts/${attemptId}/submit`, { answers });
+  submitAttempt: async (attemptId, payload) => {
+    const response = await axiosInstance.post(`/attempts/${attemptId}/submit`, payload);
     return response.data;
   },
   getAttemptResult: async (attemptId) => {
-    const response = await axiosInstance.get(`/attempts/${attemptId}/result`);
+    const response = await axiosInstance.get(`/attempts/${attemptId}`);
+    return response.data;
+  },
+
+  // Leaderboard
+  getLeaderboard: async (categoryId = null) => {
+    const params = categoryId ? { category_id: categoryId } : {};
+    const response = await axiosInstance.get('/leaderboard/', { params });
+    return response.data;
+  },
+
+  // Innovation Features
+  getFocusDNA: async (attemptId) => {
+    const response = await axiosInstance.get(`/attempts/${attemptId}/focus-dna`);
+    return response.data;
+  },
+  getMemoryHeatmap: async (attemptId) => {
+    const response = await axiosInstance.get(`/attempts/${attemptId}/memory-heatmap`);
+    return response.data;
+  },
+  getKnowledgeGalaxy: async () => {
+    const response = await axiosInstance.get('/attempts/analytics/knowledge-galaxy');
     return response.data;
   }
 };
