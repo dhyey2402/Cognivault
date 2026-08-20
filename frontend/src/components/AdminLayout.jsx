@@ -47,7 +47,7 @@ export default function AdminLayout() {
             </div>
             {!isCollapsed && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col">
-                <span className="text-xl font-bold text-white tracking-tight leading-none">Cognivault</span>
+                <span className="text-xl font-bold text-white tracking-tight leading-none">Quizora</span>
                 <span className="text-[10px] font-bold text-[var(--color-primary-light)] uppercase tracking-widest mt-1">Admin Portal</span>
               </motion.div>
             )}
@@ -153,7 +153,7 @@ export default function AdminLayout() {
         <header className={`${isAdminDashboard ? 'bg-slate-950/80 backdrop-blur-xl border-b border-white/10' : 'bg-[var(--color-background-dark)]'} h-16 flex items-center justify-between px-4 flex-shrink-0`}>
           <div className="flex items-center gap-2">
             <BrainCircuit className="w-6 h-6 text-[var(--color-primary-light)]" />
-            <span className="text-lg font-bold text-white tracking-tight">Cognivault Admin</span>
+            <span className="text-lg font-bold text-white tracking-tight">Quizora Admin</span>
           </div>
           <button className="text-white p-2">
             <LogOut className="w-5 h-5" onClick={handleLogout} />

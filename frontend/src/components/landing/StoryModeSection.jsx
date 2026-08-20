@@ -17,7 +17,7 @@ export default function StoryModeSection() {
             </div>
             <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Turn Questions Into Missions.</h3>
             <p className="text-xl text-slate-400 leading-relaxed">
-              Instead of a linear sequence of questions, Cognivault transforms suitable assessments into interactive missions. Your answers dictate the narrative. Correct answers advance the mission; incorrect ones trigger new scenarios.
+              Instead of a linear sequence of questions, Quizora transforms suitable assessments into interactive missions. Your answers dictate the narrative. Correct answers advance the mission; incorrect ones trigger new scenarios.
             </p>
             <p className="text-lg text-slate-500">
               Make assessments more engaging and memorable. Don't just answer questions—enter the challenge.

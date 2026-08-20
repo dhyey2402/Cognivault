@@ -64,7 +64,7 @@ export default function StudentLayout() {
                 <BrainCircuit className="w-6 h-6 text-[var(--color-primary)]" />
                 <div className="absolute inset-0 bg-[var(--color-primary)] opacity-0 group-hover:opacity-20 blur-md rounded-full transition-opacity duration-700"></div>
               </div>
-              <h1 className={`text-xl font-bold tracking-tight ${isDashboard ? 'text-white' : 'text-slate-900'}`}>Cognivault</h1>
+              <h1 className={`text-xl font-bold tracking-tight ${isDashboard ? 'text-white' : 'text-slate-900'}`}>Quizora</h1>
             </Link>
 
             <nav className="hidden md:flex items-center gap-2">

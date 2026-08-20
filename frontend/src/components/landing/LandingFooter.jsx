@@ -10,7 +10,7 @@ export default function LandingFooter() {
               <div className="bg-indigo-500/20 p-2 rounded-xl border border-indigo-500/30">
                 <BrainCircuit className="w-6 h-6 text-indigo-400" />
               </div>
-              <span className="text-2xl font-bold tracking-tight text-white">Cognivault</span>
+              <span className="text-2xl font-bold tracking-tight text-white">Quizora</span>
             </div>
             <p className="text-slate-400 max-w-sm leading-relaxed">
               Intelligent assessment infrastructure built for modern education and rigorous organizational training.
@@ -45,7 +45,7 @@ export default function LandingFooter() {
           </div>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-center text-slate-600 text-sm border-t border-white/5 pt-8">
-          <p>&copy; {new Date().getFullYear()} Cognivault Technologies. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Quizora Technologies. All rights reserved.</p>
           <p className="mt-2 md:mt-0">Engineered with precision.</p>
         </div>
       </div>

@@ -219,7 +219,7 @@ export default function ExamShield({
       } else {
         const duration = lastTabSwitch.current ? Math.floor((Date.now() - lastTabSwitch.current) / 1000) : 0;
         queueEvent(ExamIntegrityEventType.TAB_RETURN, { duration_away_seconds: duration }, 'INFO');
-        document.title = "Cognivault Assessment";
+        document.title = "Quizora Assessment";
         showWarning(
           "Assessment Window Left", 
           "You left the secure examination environment. This activity has been recorded."

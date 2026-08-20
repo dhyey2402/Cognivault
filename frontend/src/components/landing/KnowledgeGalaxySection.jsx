@@ -18,7 +18,7 @@ export default function KnowledgeGalaxySection() {
             </div>
             <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Turn Performance Into a Universe.</h3>
             <p className="text-xl text-slate-400 leading-relaxed">
-              Instead of presenting learning history as a boring table, Cognivault transforms performance into an interactive knowledge map. Categories become planets. Completed assessments become constellations. Strong topics become brighter regions, while weak topics become fading regions.
+              Instead of presenting learning history as a boring table, Quizora transforms performance into an interactive knowledge map. Categories become planets. Completed assessments become constellations. Strong topics become brighter regions, while weak topics become fading regions.
             </p>
             <blockquote className="border-l-4 border-emerald-500 pl-4 italic text-slate-300">
               "Student → explores → discovers → understands their knowledge."

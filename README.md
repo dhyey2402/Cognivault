@@ -1,8 +1,8 @@
-# Cognivault
+# Quizora
 
 **A High-Performance, Modern Online Assessment & Quiz Management Platform.**
 
-Cognivault is a comprehensive, production-ready assessment engine designed to create, manage, and execute secure quizzes and tests. Built with a modern technology stack, it provides administrators with powerful quiz-building tools and delivers a seamless, distraction-free testing experience for students with real-time analytics.
+Quizora is a comprehensive, production-ready assessment engine designed to create, manage, and execute secure quizzes and tests. Built with a modern technology stack, it provides administrators with powerful quiz-building tools and delivers a seamless, distraction-free testing experience for students with real-time analytics.
 
 ---
 
@@ -66,7 +66,7 @@ Cognivault is a comprehensive, production-ready assessment engine designed to cr
 
 ## 🛠️ Technology Stack
 
-Cognivault utilizes a decoupled architecture, leveraging modern frameworks for high performance and maintainability.
+Quizora utilizes a decoupled architecture, leveraging modern frameworks for high performance and maintainability.
 
 ### Frontend
 *   **Framework:** React 19 (via Vite)
@@ -94,7 +94,7 @@ Cognivault utilizes a decoupled architecture, leveraging modern frameworks for h
 
 ## 🏛️ Architecture
 
-Cognivault follows a standard Client-Server architecture with a RESTful API bridging the React frontend and FastAPI backend.
+Quizora follows a standard Client-Server architecture with a RESTful API bridging the React frontend and FastAPI backend.
 
 ```mermaid
 graph TD
@@ -117,7 +117,7 @@ graph TD
 ## 📁 Project Structure
 
 ```text
-Cognivault/
+Quizora/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/       # Reusable UI elements
@@ -201,7 +201,7 @@ The backend exposes a comprehensive, versioned REST API (`/api/v1`).
 ### 1. Clone the Repository
 ```bash
 git clone <repository-url>
-cd Cognivault
+cd Quizora
 ```
 
 ### 2. Backend Setup
@@ -222,7 +222,7 @@ touch .env
 **Backend `.env` Configuration:**
 ```ini
 # backend/.env
-DATABASE_URL=postgresql://user:password@localhost:5432/cognivault
+DATABASE_URL=postgresql://user:password@localhost:5432/quizora
 SECRET_KEY=your_super_secret_jwt_key
 ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30

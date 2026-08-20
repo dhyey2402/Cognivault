@@ -51,7 +51,7 @@ export default function ExperienceSection() {
           <div className="text-center mb-16 relative z-10">
             <h3 className="text-4xl md:text-5xl font-bold tracking-tight mb-6">Powerful Control. Beautifully Simple.</h3>
             <p className="text-xl text-slate-400 max-w-2xl mx-auto">
-              Cognivault should feel equally powerful for Administrators and Students.
+              Quizora should feel equally powerful for Administrators and Students.
             </p>
           </div>
 

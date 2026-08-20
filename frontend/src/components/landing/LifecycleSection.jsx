@@ -15,7 +15,7 @@ export default function LifecycleSection() {
       <div className="max-w-7xl mx-auto">
         <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={sectionVariants} className="text-center mb-16">
           <h2 className="text-3xl md:text-5xl font-bold tracking-tight mb-6">The Assessment Lifecycle</h2>
-          <p className="text-xl text-slate-400">Cognivault connects the entire educational journey seamlessly.</p>
+          <p className="text-xl text-slate-400">Quizora connects the entire educational journey seamlessly.</p>
         </motion.div>
 
         <div className="relative max-w-5xl mx-auto py-10">

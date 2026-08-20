@@ -23,7 +23,7 @@ export default function FinalCTA() {
               Start Exploring <ChevronRight className="w-5 h-5" />
             </Link>
             <Link to="/register" className="inline-flex items-center justify-center px-10 py-5 bg-indigo-900/50 text-white font-extrabold rounded-2xl border border-indigo-500/30 hover:bg-indigo-800/50 transition-colors text-lg">
-              Experience Cognivault
+              Experience Quizora
             </Link>
           </div>
         </div>

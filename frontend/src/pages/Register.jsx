@@ -103,11 +103,11 @@ export default function Register() {
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, ease: 'easeOut' }} className="mx-auto w-full max-w-sm lg:w-96">
           <div className="flex items-center gap-2 mb-6">
             <BrainCircuit className="w-8 h-8 text-[var(--color-primary)]" />
-            <span className="text-2xl font-bold text-slate-900 tracking-tight">Cognivault</span>
+            <span className="text-2xl font-bold text-slate-900 tracking-tight">Quizora</span>
           </div>
 
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Create your account</h2>
-          <p className="text-slate-500 mb-8">Start your learning journey with Cognivault</p>
+          <p className="text-slate-500 mb-8">Start your learning journey with Quizora</p>
 
           <form id="register-form" onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             

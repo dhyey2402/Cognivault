@@ -21,7 +21,7 @@ export default function ExamShieldSection() {
             Assessments designed for integrity.
           </h2>
           <p className="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-            Cognivault creates a monitored examination environment that detects suspicious activity, protects assessment content, and gives administrators a transparent integrity trail for every attempt.
+            Quizora creates a monitored examination environment that detects suspicious activity, protects assessment content, and gives administrators a transparent integrity trail for every attempt.
           </p>
         </div>
 

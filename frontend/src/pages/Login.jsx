@@ -119,7 +119,7 @@ export default function Login() {
         >
           <div className="flex items-center gap-2 mb-8">
             <BrainCircuit className="w-8 h-8 text-[var(--color-primary)]" />
-            <span className="text-2xl font-bold text-slate-900 tracking-tight">Cognivault</span>
+            <span className="text-2xl font-bold text-slate-900 tracking-tight">Quizora</span>
           </div>
 
           <h2 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">Welcome back</h2>

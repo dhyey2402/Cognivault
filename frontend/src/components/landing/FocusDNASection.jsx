@@ -24,7 +24,7 @@ export default function FocusDNASection() {
             </div>
             <h3 className="text-4xl md:text-5xl font-bold tracking-tight">Understand How You Think.</h3>
             <p className="text-xl text-slate-400 leading-relaxed">
-              Cognivault analyzes assessment behavior to generate meaningful learning-performance insights. We track hesitation, answer switching, time spent, response patterns, and performance changes during an assessment to build your unique cognitive profile.
+              Quizora analyzes assessment behavior to generate meaningful learning-performance insights. We track hesitation, answer switching, time spent, response patterns, and performance changes during an assessment to build your unique cognitive profile.
             </p>
           </div>
           

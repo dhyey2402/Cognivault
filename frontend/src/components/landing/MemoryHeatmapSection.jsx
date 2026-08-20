@@ -24,7 +24,7 @@ export default function MemoryHeatmapSection() {
             </div>
             <h3 className="text-4xl md:text-5xl font-bold tracking-tight">See What You Actually Remember.</h3>
             <p className="text-xl text-slate-400 leading-relaxed">
-              Instead of simply showing a score of 78%, Cognivault shows exactly where you knew the answer, where you guessed, where you hesitated, and where you struggled.
+              Instead of simply showing a score of 78%, Quizora shows exactly where you knew the answer, where you guessed, where you hesitated, and where you struggled.
             </p>
             <p className="text-lg text-slate-500">
               Visualize your cognitive journey through an assessment and optimize your study sessions.

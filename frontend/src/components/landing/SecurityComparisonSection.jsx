@@ -52,11 +52,11 @@ export default function SecurityComparisonSection() {
               </ul>
             </div>
             
-            {/* Cognivault */}
+            {/* Quizora */}
             <div className="p-10 md:p-16 relative">
               <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none"></div>
               <h4 className="text-3xl font-bold mb-8 text-indigo-400 flex items-center gap-3">
-                <BrainCircuit className="w-8 h-8" /> Cognivault
+                <BrainCircuit className="w-8 h-8" /> Quizora
               </h4>
               <ul className="space-y-5">
                 {[

@@ -4,7 +4,7 @@ import SpatialBackground from '../components/ui/SpatialBackground';
 
 // Landing Sections
 import HeroSection from '../components/landing/HeroSection';
-import WhyCognivault from '../components/landing/WhyCognivault';
+import WhyQuizora from '../components/landing/WhyQuizora';
 import ExamShieldSection from '../components/landing/ExamShieldSection';
 import KnowledgeGalaxySection from '../components/landing/KnowledgeGalaxySection';
 import FocusDNASection from '../components/landing/FocusDNASection';
@@ -31,7 +31,7 @@ export default function Landing() {
             <div className="bg-indigo-500/20 p-2 rounded-xl border border-indigo-500/30">
               <BrainCircuit className="w-6 h-6 text-indigo-400" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">Cognivault</span>
+            <span className="text-xl font-bold tracking-tight text-white">Quizora</span>
           </div>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
             <a href="#experiences" className="hover:text-white transition-colors">Platform</a>
@@ -53,7 +53,7 @@ export default function Landing() {
       <HeroSection />
 
       {/* Differentiators */}
-      <WhyCognivault />
+      <WhyQuizora />
 
       {/* ExamShield™ Major Section */}
       <div id="integrity">
