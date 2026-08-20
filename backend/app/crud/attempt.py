@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from app.models.quiz import Attempt, Answer, Question, Option, AttemptStatus
-from app.schemas.attempt import AttemptCreate, AnswerCreate
+from app.models.quiz import Attempt, Answer, Question, Option, AttemptStatus, ExamIntegrityEvent
+from app.schemas.attempt import AttemptCreate, AnswerCreate, ExamIntegrityEventCreate
 import datetime
 
 def start_attempt(db: Session, user_id: int, attempt_in: AttemptCreate):
@@ -136,9 +136,9 @@ def get_focus_dna(db: Session, attempt_id: int, user_id: int):
     if not attempt or not attempt.answers:
         return None
         
-    total_time = sum(a.time_spent_seconds for a in attempt.answers)
+    total_time = sum((a.time_spent_seconds or 0) for a in attempt.answers)
     avg_time = total_time / len(attempt.answers) if attempt.answers else 0
-    total_changes = sum(a.answer_changes for a in attempt.answers)
+    total_changes = sum((a.answer_changes or 0) for a in attempt.answers)
     
     insights = []
     profile = "Balanced Learner"
@@ -185,13 +185,13 @@ def get_memory_heatmap(db: Session, attempt_id: int, user_id: int):
         if not ans.selected_option_id:
             state = "UNANSWERED"
             summary["unanswered"] += 1
-        elif ans.answer_changes > 0:
+        elif (ans.answer_changes or 0) > 0:
             state = "CHANGED"
             summary["changed"] += 1
-        elif ans.is_correct and ans.time_spent_seconds < 15:
+        elif ans.is_correct and (ans.time_spent_seconds or 0) < 15:
             state = "KNEW_IT"
             summary["knew_it"] += 1
-        elif ans.is_correct and ans.time_spent_seconds >= 15:
+        elif ans.is_correct and (ans.time_spent_seconds or 0) >= 15:
             state = "GUESSED"
             summary["guessed"] += 1
         elif not ans.is_correct:
@@ -202,8 +202,8 @@ def get_memory_heatmap(db: Session, attempt_id: int, user_id: int):
             "question_id": ans.question_id,
             "question_text": ans.question.question_text if ans.question else "",
             "is_correct": ans.is_correct,
-            "time_spent_seconds": ans.time_spent_seconds,
-            "answer_changes": ans.answer_changes,
+            "time_spent_seconds": ans.time_spent_seconds or 0,
+            "answer_changes": ans.answer_changes or 0,
             "state": state
         })
         
@@ -260,3 +260,31 @@ def get_knowledge_galaxy(db: Session, user_id: int):
         "planets": planets,
         "total_stars": total_stars
     }
+
+def log_integrity_events(db: Session, attempt_id: int, user_id: int, events: list[ExamIntegrityEventCreate]):
+    attempt = db.query(Attempt).filter(Attempt.id == attempt_id, Attempt.user_id == user_id).first()
+    if not attempt:
+        return None
+
+    db_events = []
+    for event_in in events:
+        db_event = ExamIntegrityEvent(
+            attempt_id=attempt.id,
+            event_type=event_in.event_type,
+            occurred_at=event_in.occurred_at,
+            question_id=event_in.question_id,
+            metadata_json=event_in.metadata_json,
+            severity=event_in.severity
+        )
+        db_events.append(db_event)
+        
+    db.add_all(db_events)
+    db.commit()
+    
+    return db_events
+
+def get_attempt_integrity_events(db: Session, attempt_id: int, user_id: int):
+    attempt = db.query(Attempt).filter(Attempt.id == attempt_id, Attempt.user_id == user_id).first()
+    if not attempt:
+        return None
+    return db.query(ExamIntegrityEvent).filter(ExamIntegrityEvent.attempt_id == attempt.id).order_by(ExamIntegrityEvent.occurred_at.asc()).all()

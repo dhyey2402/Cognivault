@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Clock, Activity } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const formatTimeAgo = (dateString) => {
   if (!dateString) return 'Recently';
@@ -39,8 +40,8 @@ export default function ActivityFeed({ activities }) {
           activities.map((activity, index) => {
             const timeAgo = formatTimeAgo(activity.timestamp);
             
-            return (
-              <div key={index} className="flex items-start gap-4 p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+            const content = (
+              <div className="flex items-start gap-4 p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
                 <div className="mt-1 w-2 h-2 rounded-full bg-cyan-400 flex-shrink-0 shadow-[0_0_8px_rgba(34,211,238,0.8)]"></div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-slate-200 leading-snug">{activity.message}</p>
@@ -49,6 +50,16 @@ export default function ActivityFeed({ activities }) {
                     {timeAgo}
                   </div>
                 </div>
+              </div>
+            );
+
+            return activity.attempt_id ? (
+              <Link key={index} to={`/admin/attempts/${activity.attempt_id}`} className="block">
+                {content}
+              </Link>
+            ) : (
+              <div key={index}>
+                {content}
               </div>
             );
           })

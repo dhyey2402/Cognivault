@@ -7,7 +7,8 @@ export default function MemoryHeatmapPreview({ heatmapData, attemptId }) {
   // heatmapData should have an array of nodes/topics with retention strength (0-100)
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }} className="glass-panel rounded-3xl p-6 h-full flex flex-col">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.75 }} className="glass-panel p-6 rounded-3xl h-full flex flex-col relative overflow-hidden group hover:bg-white/10 transition-all duration-300 hover:border-white/20">
+      <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl group-hover:bg-emerald-500/20 transition-all duration-500"></div>
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-lg font-bold text-white flex items-center gap-2">
           <Brain className="w-5 h-5 text-emerald-400" /> Memory Heatmap

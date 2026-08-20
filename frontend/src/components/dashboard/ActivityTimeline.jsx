@@ -6,9 +6,9 @@ export default function ActivityTimeline({ attempts }) {
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }}
-      className="glass-panel rounded-3xl flex flex-col h-[400px]"
+      className="glass-panel p-6 rounded-3xl flex flex-col flex-1 min-h-[400px] group hover:border-white/20 transition-all duration-300"
     >
-      <div className="p-6 border-b border-white/10 flex items-center justify-between">
+      <div className="pb-4 mb-4 border-b border-white/10 flex items-center justify-between">
         <h2 className="text-xl font-bold text-white flex items-center gap-2">
           <Clock className="w-5 h-5 text-indigo-400" />
           Recent Activity

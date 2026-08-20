@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { api } from '../../services/api';
-import { ChevronLeft, ChevronRight, Bookmark, AlertTriangle, CheckCircle2, Clock, Hourglass } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Bookmark, AlertTriangle, CheckCircle2, Clock, Hourglass, Target } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import ExamShield from '../../components/ExamShield';
 
 export default function ActiveQuiz() {
   const { quizId, attemptId } = useParams();
@@ -21,6 +22,7 @@ export default function ActiveQuiz() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingIntegrityEvents, setPendingIntegrityEvents] = useState(0);
 
   useEffect(() => {
     fetchAttemptDetails();
@@ -188,8 +190,18 @@ export default function ActiveQuiz() {
   const isTimeWarning = timeLeft < 300; // < 5 mins
   const isTimeCritical = timeLeft < 60; // < 1 min
 
+  const examShieldConfig = quiz?.secure_mode_config ? JSON.parse(quiz.secure_mode_config) : {};
+
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col relative overflow-hidden font-sans">
+    <ExamShield
+      isActive={quiz?.is_secure_mode}
+      attemptId={attemptId}
+      quizId={quizId}
+      config={examShieldConfig}
+      currentQuestionId={currentQuestion?.id}
+      onEventsFlushed={(count) => setPendingIntegrityEvents(0)}
+    >
+      <div className="min-h-screen bg-slate-50 flex flex-col relative overflow-hidden font-sans w-full">
       
       {/* Top Progress Bar */}
       <div className="w-full h-1 bg-slate-200 fixed top-0 left-0 z-50">
@@ -489,5 +501,6 @@ export default function ActiveQuiz() {
         )}
       </AnimatePresence>
     </div>
+    </ExamShield>
   );
 }

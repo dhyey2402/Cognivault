@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from app.api import deps
-from app.schemas.attempt import AttemptCreate, AttemptResponse, AttemptDetailResponse, AttemptSubmit, StudentAnalytics
+from app.schemas.attempt import AttemptCreate, AttemptResponse, AttemptDetailResponse, AttemptSubmit, StudentAnalytics, ExamIntegrityEventBatch, ExamIntegrityEventResponse
 from app.crud import attempt as crud_attempt
 from app.models.user import User
 
@@ -38,6 +38,32 @@ def submit_quiz(
     if not attempt:
         raise HTTPException(status_code=400, detail="Invalid attempt or already submitted")
     return attempt
+
+@router.post("/{attempt_id}/integrity-events/batch", response_model=dict)
+def log_integrity_events(
+    attempt_id: int,
+    batch: ExamIntegrityEventBatch,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
+):
+    events = crud_attempt.log_integrity_events(db, attempt_id=attempt_id, user_id=current_user.id, events=batch.events)
+    if events is None:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+    return {"status": "success", "logged": len(events)}
+
+@router.get("/{attempt_id}/integrity-events", response_model=List[ExamIntegrityEventResponse])
+def get_integrity_events(
+    attempt_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_active_user)
+):
+    # This might be used by admins, but allowing the student to fetch their own events for now, or just restricting to admin in a separate endpoint
+    # Since it's for student's attempt, we use get_attempt_integrity_events which validates user_id
+    events = crud_attempt.get_attempt_integrity_events(db, attempt_id=attempt_id, user_id=current_user.id)
+    if events is None:
+        raise HTTPException(status_code=404, detail="Attempt not found")
+    return events
+
 
 @router.get("/analytics", response_model=StudentAnalytics)
 def get_student_analytics(

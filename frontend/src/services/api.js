@@ -24,11 +24,11 @@ export const api = {
 
   // Categories
   getCategories: async () => {
-    const response = await axiosInstance.get('/categories');
+    const response = await axiosInstance.get('/categories/');
     return response.data;
   },
   createCategory: async (data) => {
-    const response = await axiosInstance.post('/categories', data);
+    const response = await axiosInstance.post('/categories/', data);
     return response.data;
   },
   updateCategory: async (id, data) => {
@@ -42,11 +42,11 @@ export const api = {
 
   // Quizzes
   getQuizzes: async () => {
-    const response = await axiosInstance.get('/quizzes');
+    const response = await axiosInstance.get('/quizzes/');
     return response.data;
   },
   getAdminQuizzes: async () => {
-    const response = await axiosInstance.get('/quizzes');
+    const response = await axiosInstance.get('/quizzes/');
     return response.data;
   },
   getQuiz: async (id) => {
@@ -58,7 +58,7 @@ export const api = {
     return response.data;
   },
   createQuiz: async (data) => {
-    const response = await axiosInstance.post('/quizzes', data);
+    const response = await axiosInstance.post('/quizzes/', data);
     return response.data;
   },
   updateQuiz: async (id, data) => {
@@ -100,8 +100,16 @@ export const api = {
     const response = await axiosInstance.post(`/attempts/${attemptId}/submit`, payload);
     return response.data;
   },
+  submitIntegrityEvents: async (attemptId, events) => {
+    const response = await axiosInstance.post(`/attempts/${attemptId}/integrity-events/batch`, { events });
+    return response.data;
+  },
   getAttemptResult: async (attemptId) => {
     const response = await axiosInstance.get(`/attempts/${attemptId}`);
+    return response.data;
+  },
+  getIntegrityEvents: async (attemptId) => {
+    const response = await axiosInstance.get(`/attempts/${attemptId}/integrity-events`);
     return response.data;
   },
 

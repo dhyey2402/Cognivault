@@ -1,12 +1,15 @@
-from fastapi import APIRouter, Depends, HTTPException, Form, Request
+from fastapi import APIRouter, Depends, HTTPException, Form, Request, Response, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from app.api import deps
 from app.schemas.user import UserCreate, UserResponse
-from app.schemas.token import Token
+from app.schemas.token import Token, TokenPayload
 from app.crud import user as crud_user
-from app.core.security import verify_password, create_access_token
+from app.core.security import verify_password, create_access_token, create_refresh_token
+from app.core.config import settings
+from jose import jwt, JWTError
 import time
+from datetime import timedelta
 
 router = APIRouter()
 
@@ -30,11 +33,10 @@ def register(user_in: UserCreate, db: Session = Depends(deps.get_db)):
     user = crud_user.create_user(db, user_in)
     return user
 
-from datetime import timedelta
-
 @router.post("/login", response_model=Token)
 def login_access_token(
     request: Request,
+    response: Response,
     db: Session = Depends(deps.get_db),
     form_data: OAuth2PasswordRequestForm = Depends(),
     remember_me: bool = Form(False)
@@ -62,13 +64,71 @@ def login_access_token(
     elif not user.status:
         raise HTTPException(status_code=400, detail="Inactive user")
         
-    expires_delta = timedelta(days=30) if remember_me else None
-    
     # Successful login, clear attempts
     if client_ip in login_attempts:
         del login_attempts[client_ip]
     
+    # Access token is always short-lived
+    access_token = create_access_token(user.id)
+    
+    # Refresh token lives for 60 days if remember_me is true, otherwise 1 day
+    refresh_expires_delta = timedelta(days=60) if remember_me else timedelta(days=1)
+    refresh_token = create_refresh_token(user.id, expires_delta=refresh_expires_delta)
+    
+    # Set the refresh token as an HttpOnly cookie
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=False, # Set to True in production (HTTPS)
+        samesite="lax",
+        max_age=int(refresh_expires_delta.total_seconds())
+    )
+    
     return {
-        "access_token": create_access_token(user.id, expires_delta=expires_delta),
+        "access_token": access_token,
         "token_type": "bearer",
     }
+
+@router.post("/refresh", response_model=Token)
+def refresh_token(
+    response: Response,
+    db: Session = Depends(deps.get_db),
+    refresh_token: str | None = Cookie(default=None)
+):
+    """
+    Exchange a valid refresh token for a new access token.
+    """
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token missing")
+        
+    try:
+        payload = jwt.decode(
+            refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        token_data = TokenPayload(**payload)
+        
+        if token_data.sub is None or token_data.type != "refresh":
+            raise HTTPException(status_code=401, detail="Invalid refresh token")
+            
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+        
+    user = crud_user.get_user_by_id(db, id=int(token_data.sub))
+    if not user or not user.status:
+        raise HTTPException(status_code=401, detail="User not found or inactive")
+        
+    new_access_token = create_access_token(user.id)
+    
+    return {
+        "access_token": new_access_token,
+        "token_type": "bearer",
+    }
+
+@router.post("/logout")
+def logout(response: Response):
+    """
+    Logout by clearing the refresh token cookie.
+    """
+    response.delete_cookie("refresh_token")
+    return {"message": "Successfully logged out"}

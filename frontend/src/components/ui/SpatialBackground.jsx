@@ -5,28 +5,68 @@ export default function SpatialBackground() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d', { alpha: false });
     
     // Config
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const GRID_SIZE = 25; // number of points per axis
-    const SPACING = 50;   // spacing in 3d units
-    const BASE_Y = 200;   // base height below camera
-    const SPEED = isReducedMotion ? 0 : 0.001; // slower speed for calm effect
-    const FOCAL_LENGTH = 300; // perspective intensity
+    const isMobile = window.innerWidth < 768;
+    
+    const FOCAL_LENGTH = isMobile ? 500 : 800; 
+    const CAMERA_Z = -500;
+    
+    const GRID_COLS = isMobile ? 25 : 55;
+    const GRID_ROWS = isMobile ? 30 : 65;
+    const GRID_SPACING_X = isMobile ? 200 : 160;
+    const GRID_SPACING_Z = isMobile ? 250 : 200;
+    const START_Z = 200;
+    const SPEED = isReducedMotion ? 0 : 2.5;
 
     let width = window.innerWidth;
     let height = window.innerHeight;
     let animationFrameId;
     let time = 0;
+    let zOffset = 0;
     
-    // Parallax state
-    let targetMouseX = 0;
-    let targetMouseY = 0;
-    let currentMouseX = 0;
-    let currentMouseY = 0;
+    // Parallax
+    let targetCamX = 0;
+    let targetCamY = 0;
+    let camX = 0;
+    let camY = 0;
 
-    // Resize handler
+    // Pseudo-random hash to keep nodes statically pinned to the flowing terrain
+    const hash = (x, z) => {
+      let h = Math.sin(x * 12.9898 + z * 78.233) * 43758.5453;
+      return h - Math.floor(h);
+    };
+
+    const getElevation = (gx, gz, t) => {
+      // gx and gz are world coordinates
+      // Wave 1: large sweeping organic hills
+      const w1 = Math.sin(gx * 0.0008 + t * 0.4) * Math.cos(gz * 0.0008 + t * 0.3) * 400;
+      // Wave 2: medium disruptive details
+      const w2 = Math.sin(gx * 0.002 - t * 0.6) * Math.sin(gz * 0.002 + t * 0.5) * 150;
+      // Wave 3: central valley (pushes the terrain down in the center so UI remains readable)
+      const valleyFactor = Math.exp(-(gx * gx) / 1500000);
+      
+      // Base elevation + waves + deep central valley
+      return 250 + w1 + w2 + (valleyFactor * 300);
+    };
+
+    const project = (x, y, z) => {
+      const relX = x - camX;
+      const relY = y - camY;
+      const relZ = z - CAMERA_Z;
+
+      if (relZ <= 0) return null;
+
+      const scale = FOCAL_LENGTH / relZ;
+      const screenX = width / 2 + relX * scale;
+      const screenY = height / 2 + relY * scale;
+
+      return { x: screenX, y: screenY, scale, z: relZ };
+    };
+
     const handleResize = () => {
       width = window.innerWidth;
       height = window.innerHeight;
@@ -34,157 +74,163 @@ export default function SpatialBackground() {
       canvas.height = height;
     };
     
-    // Mouse handler
     const handleMouseMove = (e) => {
-      if (isReducedMotion) return;
-      // Map mouse to -1 to 1 range
-      targetMouseX = (e.clientX / width) * 2 - 1;
-      targetMouseY = (e.clientY / height) * 2 - 1;
+      if (isReducedMotion || isMobile) return;
+      // Parallax mapped to a spatial shift
+      targetCamX = ((e.clientX / width) - 0.5) * 1000;
+      targetCamY = ((e.clientY / height) - 0.5) * 350;
     };
 
     window.addEventListener('resize', handleResize);
     window.addEventListener('mousemove', handleMouseMove);
     handleResize();
 
-    // The grid is centered at x=0, z starts slightly in front of camera (z > 0)
-    const points = [];
-    for (let x = -GRID_SIZE / 2; x < GRID_SIZE / 2; x++) {
-      for (let z = 0; z < GRID_SIZE; z++) {
-        points.push({
-          x: x * SPACING,
-          z: z * SPACING + 50, // offset z so it's not right at camera
-          baseY: BASE_Y,
-          // Random offset for nodes to make it look organic
-          offsetX: (Math.random() - 0.5) * 15,
-          offsetZ: (Math.random() - 0.5) * 15,
-          activePhase: Math.random() * Math.PI * 2 // for pulsing
-        });
-      }
-    }
-
-    // Helper to project 3D to 2D
-    const project = (x, y, z) => {
-      // Avoid division by zero
-      const safeZ = z < 1 ? 1 : z;
-      const scale = FOCAL_LENGTH / safeZ;
-      // Center projection on screen
-      const screenX = width / 2 + x * scale;
-      const screenY = height / 2 + y * scale;
-      return { x: screenX, y: screenY, scale };
-    };
-
     const draw = () => {
-      time += SPEED;
-      
-      // Smoothly interpolate mouse parallax
-      currentMouseX += (targetMouseX - currentMouseX) * 0.05;
-      currentMouseY += (targetMouseY - currentMouseY) * 0.05;
+      time += 0.016;
+      zOffset = (zOffset + SPEED) % GRID_SPACING_Z;
 
-      // Dark atmospheric background
-      ctx.fillStyle = '#050B14'; // very dark slate/indigo
+      camX += (targetCamX - camX) * 0.03;
+      camY += (targetCamY - camY) * 0.03;
+
+      // Base background (very deep navy/black)
+      ctx.fillStyle = '#020617'; 
       ctx.fillRect(0, 0, width, height);
 
-      // Subtle gradient at bottom for depth
-      const grad = ctx.createLinearGradient(0, height * 0.5, 0, height);
-      grad.addColorStop(0, 'transparent');
-      grad.addColorStop(1, 'rgba(79, 70, 229, 0.05)'); // subtle primary color
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, width, height);
+      const halfCols = Math.floor(GRID_COLS / 2);
 
-      const projectedPoints = [];
-      const cameraYOffset = currentMouseY * 50;
-      const cameraXOffset = currentMouseX * 100;
-
-      // Calculate 3D points
-      for (let i = 0; i < points.length; i++) {
-        const p = points[i];
+      // 1. Pre-calculate the grid points for this frame
+      const grid = [];
+      for (let r = 0; r <= GRID_ROWS; r++) {
+        const row = [];
+        const worldZ = START_Z + r * GRID_SPACING_Z - zOffset;
         
-        // Continuous flowing motion in Z direction
-        // When point goes behind camera, wrap it to the back
-        let currentZ = p.z - (time * 500) % SPACING; 
-        if (currentZ < 10) currentZ += GRID_SIZE * SPACING;
-
-        // Wave function for Y
-        // Combination of sine waves based on X and Z for a rolling terrain effect
-        const wave1 = Math.sin(p.x * 0.02 + time * 1000) * 30;
-        const wave2 = Math.cos(currentZ * 0.01 + time * 800) * 40;
-        const y = p.baseY + wave1 + wave2 + cameraYOffset;
-        
-        const x = p.x + p.offsetX + cameraXOffset;
-
-        const proj = project(x, y, currentZ);
-        
-        // Calculate point visibility based on distance
-        const distRatio = currentZ / (GRID_SIZE * SPACING);
-        const opacity = Math.max(0, 1 - distRatio); // Fade out in distance
-        
-        projectedPoints.push({
-          ...proj,
-          opacity,
-          z: currentZ,
-          activePhase: p.activePhase
-        });
+        for (let c = 0; c <= GRID_COLS; c++) {
+          const worldX = (c - halfCols) * GRID_SPACING_X;
+          const worldY = getElevation(worldX, worldZ, time);
+          
+          const p = project(worldX, worldY, worldZ);
+          
+          // Determine if this intersection hosts a knowledge node
+          const gridZId = Math.round(worldZ / GRID_SPACING_Z);
+          const gridXId = c;
+          
+          const isNode = hash(gridXId, gridZId) > (isMobile ? 0.95 : 0.92);
+          const nodeType = isNode ? Math.floor(hash(gridXId + 1, gridZId) * 3) : 0;
+          
+          row.push({ p, isNode, nodeType, worldZ, worldX });
+        }
+        grid.push(row);
       }
 
-      // Sort by Z to draw back to front (painter's algorithm)
-      // Though for additive blending or simple lines, sorting isn't strictly necessary, it helps.
-      projectedPoints.sort((a, b) => b.z - a.z);
-
-      // Draw lines and nodes
-      ctx.lineWidth = 1;
+      // 2. Draw quads back-to-front (Painter's Algorithm for occlusion)
+      const maxZ = START_Z + GRID_ROWS * GRID_SPACING_Z;
       
-      for (let i = 0; i < projectedPoints.length; i++) {
-        const p = projectedPoints[i];
-        if (p.opacity <= 0.01) continue;
+      for (let r = GRID_ROWS - 1; r >= 0; r--) {
+        for (let c = 0; c < GRID_COLS; c++) {
+          const p1 = grid[r][c];
+          const p2 = grid[r][c+1];
+          const p3 = grid[r+1][c+1];
+          const p4 = grid[r+1][c];
 
-        // Draw node
-        const pulse = Math.sin(time * 2000 + p.activePhase) * 0.5 + 0.5;
-        // Nodes closer are larger
-        const nodeSize = Math.max(0.5, p.scale * 3);
-        
-        // Base color + subtle primary glow based on pulse
-        const alpha = p.opacity * (0.3 + pulse * 0.5);
-        ctx.fillStyle = `rgba(99, 102, 241, ${alpha})`;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, nodeSize, 0, Math.PI * 2);
-        ctx.fill();
+          // Skip if quad is behind camera
+          if (!p1.p || !p2.p || !p3.p || !p4.p) continue;
 
-        // Optional: glowing effect for select nodes
-        if (pulse > 0.9 && p.z < (GRID_SIZE * SPACING * 0.5)) {
-           ctx.shadowBlur = 10;
-           ctx.shadowColor = 'rgba(99, 102, 241, 0.8)';
-           ctx.fillStyle = `rgba(165, 180, 252, ${alpha + 0.2})`;
-           ctx.beginPath();
-           ctx.arc(p.x, p.y, nodeSize * 1.5, 0, Math.PI * 2);
-           ctx.fill();
-           ctx.shadowBlur = 0;
-        }
+          // Depth based alpha calculation
+          const avgZ = (p1.worldZ + p2.worldZ + p3.worldZ + p4.worldZ) / 4;
+          const depthRatio = Math.max(0, 1 - (avgZ / maxZ));
+          
+          // Exponential fade for smooth horizon blend
+          const alpha = Math.pow(depthRatio, 1.8); 
+          
+          if (alpha < 0.02) continue; // cull invisible geometry
 
-        // Draw interconnected lines to nearby nodes to form a mesh
-        // To be performant, we only connect to the "next" node in the array
-        // (This is a simplified mesh drawing that looks sufficiently interconnected)
-        if (i < projectedPoints.length - 1) {
-            const nextP = projectedPoints[i + 1];
-            // Only connect if they are somewhat close in 3D space to avoid long cross-screen lines
-            const dx = p.x - nextP.x;
-            const dy = p.y - nextP.y;
-            const dist = dx*dx + dy*dy;
+          // Draw the physical quad
+          ctx.beginPath();
+          ctx.moveTo(p1.p.x, p1.p.y);
+          ctx.lineTo(p2.p.x, p2.p.y);
+          ctx.lineTo(p3.p.x, p3.p.y);
+          ctx.lineTo(p4.p.x, p4.p.y);
+          ctx.closePath();
+
+          // Fill with base color to occlude lines behind it (solid terrain illusion)
+          ctx.fillStyle = '#020617';
+          ctx.fill();
+
+          // Highlight center paths for visual structure
+          const isCenter = Math.abs(c - halfCols) < 4;
+          
+          // Dynamic data pulses flowing down the grid lines
+          const pulseHash = hash(c, 0);
+          const isPulseCol = pulseHash > 0.85;
+          const pulseZ = (time * 1800 * pulseHash) % maxZ;
+          const distToPulse = Math.abs(avgZ - pulseZ);
+          const pulseGlow = isPulseCol && distToPulse < 1000 ? 1 - (distToPulse / 1000) : 0;
+
+          if (pulseGlow > 0 && !isReducedMotion) {
+            ctx.strokeStyle = `rgba(139, 92, 246, ${alpha * 0.9 + pulseGlow * 0.6})`; // Electric violet pulse
+            ctx.lineWidth = 1.5;
+          } else {
+            ctx.strokeStyle = `rgba(49, 46, 129, ${alpha * (isCenter ? 0.6 : 0.25)})`; // Deep indigo grid
+            ctx.lineWidth = 1;
+          }
+          
+          ctx.stroke();
+
+          // Draw Nodes at the front-left vertex
+          if (p1.isNode) {
+            const screenRadius = Math.max(0.5, 3.5 * p1.p.scale);
+            ctx.beginPath();
+            ctx.arc(p1.p.x, p1.p.y, screenRadius, 0, Math.PI * 2);
             
-            if (dist < 15000 * p.scale) {
-                const lineAlpha = p.opacity * 0.15;
-                ctx.strokeStyle = `rgba(99, 102, 241, ${lineAlpha})`;
-                ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                ctx.lineTo(nextP.x, nextP.y);
-                ctx.stroke();
+            if (p1.nodeType === 0) {
+              ctx.fillStyle = `rgba(14, 165, 233, ${alpha})`; // Cyan
+            } else if (p1.nodeType === 1) {
+              ctx.fillStyle = `rgba(168, 85, 247, ${alpha})`; // Magenta/Purple
+            } else {
+              ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`; // Bright Core
             }
+            ctx.fill();
+
+            // Glow for foreground nodes
+            if (alpha > 0.3 && !isMobile && !isReducedMotion) {
+              ctx.shadowBlur = 15;
+              ctx.shadowColor = ctx.fillStyle;
+              ctx.beginPath();
+              ctx.arc(p1.p.x, p1.p.y, screenRadius * 1.5, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(255,255,255,${alpha * 0.6})`;
+              ctx.fill();
+              ctx.shadowBlur = 0;
+            }
+          }
         }
       }
+
+      // 3. Volumetric Atmospheric Fog & UI Contrast Layer
+      const cx = width / 2;
+      const cy = height / 2;
+      
+      // Radial vignette to darken edges and keep focus centered
+      const vignette = ctx.createRadialGradient(cx, cy, height * 0.2, cx, cy, Math.max(width, height) * 0.85);
+      vignette.addColorStop(0, 'rgba(2, 6, 23, 0)'); // clear center
+      vignette.addColorStop(1, 'rgba(2, 6, 23, 0.92)'); // dark edges
+      ctx.fillStyle = vignette;
+      ctx.fillRect(0, 0, width, height);
+
+      // Linear horizon fog to smoothly blend the distant terrain into the sky
+      const horizon = ctx.createLinearGradient(0, 0, 0, height);
+      horizon.addColorStop(0, 'rgba(2, 6, 23, 1)'); // completely opaque sky
+      horizon.addColorStop(0.35, 'rgba(2, 6, 23, 0.8)'); // dense horizon mist
+      horizon.addColorStop(0.7, 'rgba(2, 6, 23, 0)'); // clear foreground
+      ctx.fillStyle = horizon;
+      ctx.fillRect(0, 0, width, height);
+      
+      // Subtle darkening overlay to ensure UI elements (cards/text) remain readable
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.3)';
+      ctx.fillRect(0, 0, width, height);
 
       animationFrameId = requestAnimationFrame(draw);
     };
 
-    // Start animation
     draw();
 
     return () => {
@@ -198,9 +244,6 @@ export default function SpatialBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none -z-10"
-      style={{
-        background: '#050B14' // fallback if canvas fails
-      }}
     />
   );
 }

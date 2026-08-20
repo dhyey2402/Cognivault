@@ -1,18 +1,34 @@
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LogIn, BrainCircuit, Lightbulb, Trophy, Target, Eye, EyeOff } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 export default function Login() {
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const { login } = useAuth();
+  const storedEmail = localStorage.getItem('rememberedEmail');
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      email: storedEmail || ''
+    }
+  });
+  const { login, user, loading } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!loading && user) {
+      if (user.role === 'ADMIN' || user.role === 'TEACHER') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [user, loading, navigate]);
 
   const onSubmit = async (data) => {
     try {

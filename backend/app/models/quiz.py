@@ -19,6 +19,24 @@ class AttemptStatus(str, enum.Enum):
     PASSED = "PASSED"
     FAILED = "FAILED"
 
+class ExamIntegrityEventType(str, enum.Enum):
+    RIGHT_CLICK_ATTEMPT = "RIGHT_CLICK_ATTEMPT"
+    COPY_ATTEMPT = "COPY_ATTEMPT"
+    CUT_ATTEMPT = "CUT_ATTEMPT"
+    PASTE_ATTEMPT = "PASTE_ATTEMPT"
+    PRINT_ATTEMPT = "PRINT_ATTEMPT"
+    DEVTOOLS_ATTEMPT = "DEVTOOLS_ATTEMPT"
+    TAB_SWITCH = "TAB_SWITCH"
+    TAB_RETURN = "TAB_RETURN"
+    FOCUS_LOST = "FOCUS_LOST"
+    FOCUS_REGAINED = "FOCUS_REGAINED"
+    FULLSCREEN_EXIT = "FULLSCREEN_EXIT"
+    FULLSCREEN_ENTER = "FULLSCREEN_ENTER"
+    KEYBOARD_VIOLATION = "KEYBOARD_VIOLATION"
+    DRAG_ATTEMPT = "DRAG_ATTEMPT"
+    EXTERNAL_DROP_ATTEMPT = "EXTERNAL_DROP_ATTEMPT"
+    NAVIGATION_ATTEMPT = "NAVIGATION_ATTEMPT"
+
 class Category(Base):
     __tablename__ = "categories"
 
@@ -43,6 +61,8 @@ class Quiz(Base):
     max_attempts = Column(Integer, default=1)
     status = Column(SQLEnum(QuizStatus), default=QuizStatus.DRAFT)
     is_story_mode = Column(Boolean, default=False)
+    is_secure_mode = Column(Boolean, default=False)
+    secure_mode_config = Column(Text, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -95,6 +115,7 @@ class Attempt(Base):
     user = relationship("User")
     quiz = relationship("Quiz", back_populates="attempts")
     answers = relationship("Answer", back_populates="attempt", cascade="all, delete-orphan")
+    integrity_events = relationship("ExamIntegrityEvent", back_populates="attempt", cascade="all, delete-orphan")
 
 class Answer(Base):
     __tablename__ = "answers"
@@ -110,3 +131,18 @@ class Answer(Base):
     attempt = relationship("Attempt", back_populates="answers")
     question = relationship("Question")
     selected_option = relationship("Option")
+
+class ExamIntegrityEvent(Base):
+    __tablename__ = "exam_integrity_events"
+
+    id = Column(Integer, primary_key=True, index=True)
+    attempt_id = Column(Integer, ForeignKey("attempts.id", ondelete="CASCADE"), index=True)
+    event_type = Column(SQLEnum(ExamIntegrityEventType), nullable=False)
+    occurred_at = Column(DateTime(timezone=True), nullable=False)
+    question_id = Column(Integer, ForeignKey("questions.id", ondelete="SET NULL"), nullable=True)
+    metadata_json = Column(Text, nullable=True)
+    severity = Column(String(50), default="INFO")
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    attempt = relationship("Attempt", back_populates="integrity_events")
+    question = relationship("Question")

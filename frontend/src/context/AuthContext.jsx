@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import api from '../lib/api';
+import api, { setAccessToken, getAccessToken } from '../lib/api';
+import axios from 'axios'; // We might need this for raw refresh calls if needed, but api works
 
 const AuthContext = createContext();
 
@@ -8,23 +9,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      if (token) {
-        try {
-          const response = await api.get('/users/me');
-          setUser({ token, ...response.data });
-        } catch (error) {
-          console.error("Failed to fetch user profile", error);
-          localStorage.removeItem('token');
-          sessionStorage.removeItem('token');
-          setUser(null);
-        }
+    const initAuth = async () => {
+      try {
+        // Try to refresh token on initial load
+        const response = await axios.post('http://localhost:8000/api/v1/auth/refresh', {}, {
+          withCredentials: true
+        });
+        const newAccessToken = response.data.access_token;
+        setAccessToken(newAccessToken);
+        
+        // Fetch profile with new access token
+        const profileRes = await api.get('/users/me');
+        setUser({ token: newAccessToken, ...profileRes.data });
+      } catch (error) {
+        // No valid refresh token cookie or it expired
+        setAccessToken(null);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     
-    fetchUser();
+    initAuth();
   }, []);
 
   const login = async (email, password, rememberMe = false) => {
@@ -38,13 +44,13 @@ export function AuthProvider({ children }) {
     });
     
     const { access_token } = response.data;
+    setAccessToken(access_token);
     
+    // Remember email logic for UX
     if (rememberMe) {
-      localStorage.setItem('token', access_token);
-      sessionStorage.removeItem('token');
+      localStorage.setItem('rememberedEmail', email);
     } else {
-      sessionStorage.setItem('token', access_token);
-      localStorage.removeItem('token');
+      localStorage.removeItem('rememberedEmail');
     }
     
     // Fetch profile
@@ -59,9 +65,13 @@ export function AuthProvider({ children }) {
     return response.data;
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('token');
+  const logout = async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (e) {
+      console.error('Logout error', e);
+    }
+    setAccessToken(null);
     setUser(null);
   };
 

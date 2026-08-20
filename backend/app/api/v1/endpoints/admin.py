@@ -128,6 +128,7 @@ def get_dashboard_analytics(
 
     # RECENT ACTIVITY
     recent_attempts_details = db.query(
+        Attempt.id,
         Attempt.completed_at,
         Attempt.percentage,
         User.name.label('user_name'),
@@ -138,7 +139,8 @@ def get_dashboard_analytics(
         {
             "type": "quiz_completed",
             "message": f"{a.user_name} completed '{a.quiz_title}' with {a.percentage}%",
-            "timestamp": a.completed_at.isoformat() if a.completed_at else None
+            "timestamp": a.completed_at.isoformat() if a.completed_at else None,
+            "attempt_id": a.id
         }
         for a in recent_attempts_details
     ]

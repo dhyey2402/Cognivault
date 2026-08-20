@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
-from app.models.quiz import AttemptStatus
+from app.models.quiz import AttemptStatus, ExamIntegrityEventType
 from app.schemas.quiz import QuizResponse, QuestionResponse, OptionResponse
 
 class AnswerBase(BaseModel):
@@ -95,3 +95,24 @@ class KnowledgeGalaxyCategory(BaseModel):
 class KnowledgeGalaxy(BaseModel):
     planets: List[KnowledgeGalaxyCategory]
     total_stars: int
+
+class ExamIntegrityEventBase(BaseModel):
+    event_type: ExamIntegrityEventType
+    occurred_at: datetime
+    question_id: Optional[int] = None
+    metadata_json: Optional[str] = None
+    severity: Optional[str] = "INFO"
+
+class ExamIntegrityEventCreate(ExamIntegrityEventBase):
+    pass
+
+class ExamIntegrityEventBatch(BaseModel):
+    events: List[ExamIntegrityEventCreate]
+
+class ExamIntegrityEventResponse(ExamIntegrityEventBase):
+    id: int
+    attempt_id: int
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

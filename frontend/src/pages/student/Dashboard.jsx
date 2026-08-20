@@ -77,66 +77,67 @@ export default function Dashboard() {
   } = stats || {};
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12 relative z-10">
+    <div className="flex flex-col gap-6 animate-fade-in pb-12 relative z-10 w-full max-w-7xl mx-auto">
       
-      {/* Hero Section */}
-      <DashboardHero user={user} stats={stats} />
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <MetricCard
-          title="Attempted"
-          value={total_attempts}
-          colorClass="text-indigo-400"
-          icon={<Target className="w-6 h-6" />}
-          delay={0.1}
-        />
-        <MetricCard
-          title="Avg Score"
-          value={`${average_score}%`}
-          colorClass="text-amber-400"
-          icon={<Trophy className="w-6 h-6" />}
-          delay={0.2}
-        />
-        <MetricCard
-          title="Best Score"
-          value={`${highest_score}%`}
-          colorClass="text-emerald-400"
-          icon={<CheckCircle2 className="w-6 h-6" />}
-          delay={0.3}
-        />
-        <MetricCard
-          title="Passed"
-          value={passed_quizzes}
-          colorClass="text-purple-400"
-          icon={<Clock className="w-6 h-6" />}
-          delay={0.4}
-        />
+      {/* Top Row: Hero & Stats */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8 flex flex-col">
+          <DashboardHero user={user} stats={stats} />
+        </div>
+        <div className="lg:col-span-4 grid grid-cols-2 gap-4">
+          <MetricCard
+            title="Attempted"
+            value={total_attempts}
+            colorClass="text-indigo-400"
+            icon={<Target className="w-5 h-5" />}
+            delay={0.1}
+          />
+          <MetricCard
+            title="Avg Score"
+            value={`${average_score}%`}
+            colorClass="text-amber-400"
+            icon={<Trophy className="w-5 h-5" />}
+            delay={0.2}
+          />
+          <MetricCard
+            title="Best Score"
+            value={`${highest_score}%`}
+            colorClass="text-emerald-400"
+            icon={<CheckCircle2 className="w-5 h-5" />}
+            delay={0.3}
+          />
+          <MetricCard
+            title="Passed"
+            value={passed_quizzes}
+            colorClass="text-purple-400"
+            icon={<Clock className="w-5 h-5" />}
+            delay={0.4}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-8">
-          {/* Continue Learning recommendation */}
-          <ContinueLearning recentAttempts={recent_attempts} />
-          
-          {/* Performance Chart */}
-          <PerformanceChart history={performance_history} />
-
-          {/* Knowledge Galaxy Preview */}
+      {/* Middle Row: Galaxy & Focus/Continue */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-7 flex flex-col">
           <KnowledgeGalaxyPreview galaxy={galaxy} />
         </div>
-
-        <div className="space-y-8">
-          {/* Focus DNA Preview */}
+        <div className="lg:col-span-5 flex flex-col gap-6">
+          <ContinueLearning recentAttempts={recent_attempts} />
           <FocusDNAPreview dnaData={dna} attemptId={recentAttemptId} />
-          
-          {/* Memory Heatmap Preview */}
+        </div>
+      </div>
+
+      {/* Bottom Row: Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div className="lg:col-span-8 flex flex-col">
+          <PerformanceChart history={performance_history} />
+        </div>
+        <div className="lg:col-span-4 flex flex-col gap-6">
           <MemoryHeatmapPreview heatmapData={heatmap} attemptId={recentAttemptId} />
-          
-          {/* Activity Timeline */}
           <ActivityTimeline attempts={recent_attempts} />
         </div>
       </div>
+
     </div>
   );
 }

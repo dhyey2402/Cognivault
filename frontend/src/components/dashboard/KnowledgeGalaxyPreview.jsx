@@ -6,9 +6,9 @@ export default function KnowledgeGalaxyPreview({ galaxy }) {
   if (!galaxy) return null;
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="glass-panel-strong rounded-3xl p-8 relative overflow-hidden group">
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="glass-panel-strong rounded-3xl p-8 lg:p-10 relative overflow-hidden group h-full flex flex-col justify-center border border-indigo-500/10 hover:border-indigo-500/30 transition-all duration-500 hover:shadow-[0_0_40px_rgba(79,70,229,0.15)]">
       {/* Starfield Background */}
-      <div className="absolute inset-0 opacity-30 pointer-events-none">
+      <div className="absolute inset-0 opacity-30 pointer-events-none mix-blend-screen">
         {[...Array(20)].map((_, i) => (
           <div key={i} className="absolute bg-white rounded-full" style={{
             width: Math.random() * 3 + 'px',

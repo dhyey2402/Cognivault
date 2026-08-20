@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../../services/api';
-import { ArrowLeft, Plus, Save, Trash2, GripVertical, CheckCircle2, Copy, Check, Lightbulb } from 'lucide-react';
+import { ArrowLeft, Plus, Save, Trash2, GripVertical, CheckCircle2, Copy, Check, Lightbulb, Edit2, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -183,21 +183,38 @@ export default function QuizBuilder() {
         <div className="pl-12">
           <div className="flex justify-between items-start">
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">{quiz?.title}</h1>
-            <button 
-              onClick={async () => {
-                const newMode = !quiz.is_story_mode;
-                await api.updateQuiz(quiz.id, { is_story_mode: newMode });
-                setQuiz({ ...quiz, is_story_mode: newMode });
-                toast.success(newMode ? 'Story Mode Enabled' : 'Story Mode Disabled');
-              }}
-              className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors border-2 ${
-                quiz?.is_story_mode 
-                  ? 'bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200'
-                  : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              ✨ {quiz?.is_story_mode ? 'Story Mode ON' : 'Story Mode OFF'}
-            </button>
+            <div className="flex gap-2">
+              <button 
+                onClick={async () => {
+                  const newMode = !quiz.is_story_mode;
+                  await api.updateQuiz(quiz.id, { is_story_mode: newMode });
+                  setQuiz({ ...quiz, is_story_mode: newMode });
+                  toast.success(newMode ? 'Story Mode Enabled' : 'Story Mode Disabled');
+                }}
+                className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors border-2 ${
+                  quiz?.is_story_mode 
+                    ? 'bg-indigo-100 text-indigo-700 border-indigo-200 hover:bg-indigo-200'
+                    : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                ✨ {quiz?.is_story_mode ? 'Story Mode ON' : 'Story Mode OFF'}
+              </button>
+              <button 
+                onClick={async () => {
+                  const newMode = !quiz.is_secure_mode;
+                  await api.updateQuiz(quiz.id, { is_secure_mode: newMode });
+                  setQuiz({ ...quiz, is_secure_mode: newMode });
+                  toast.success(newMode ? 'ExamShield Enabled' : 'ExamShield Disabled');
+                }}
+                className={`px-4 py-2 rounded-lg font-bold text-sm transition-colors border-2 flex items-center gap-1 ${
+                  quiz?.is_secure_mode 
+                    ? 'bg-red-50 text-red-700 border-red-200 hover:bg-red-100'
+                    : 'bg-slate-50 text-slate-500 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <ShieldAlert className="w-4 h-4" /> {quiz?.is_secure_mode ? 'ExamShield ON' : 'ExamShield OFF'}
+              </button>
+            </div>
           </div>
           <div className="flex items-center gap-4 mt-3">
             <div className="flex items-center gap-1.5 text-sm font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-lg">
