@@ -79,7 +79,8 @@ def create_question_with_options(db: Session, quiz_id: int, question: QuestionCr
         question_text=question.question_text,
         marks=question.marks,
         explanation=question.explanation,
-        difficulty=question.difficulty
+        difficulty=question.difficulty,
+        story_context=question.story_context
     )
     db.add(db_question)
     db.commit()
@@ -89,7 +90,8 @@ def create_question_with_options(db: Session, quiz_id: int, question: QuestionCr
         db_option = Option(
             question_id=db_question.id,
             option_text=opt.option_text,
-            is_correct=opt.is_correct
+            is_correct=opt.is_correct,
+            story_consequence=opt.story_consequence
         )
         db.add(db_option)
     
