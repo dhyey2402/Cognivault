@@ -113,13 +113,26 @@ export default function QuizBuilder() {
       return;
     }
 
+      const payload = {
+      question_text: questionForm.text,
+      marks: questionForm.marks,
+      difficulty: questionForm.difficulty,
+      explanation: questionForm.explanation,
+      story_context: questionForm.story_context,
+      options: questionForm.options.map(opt => ({
+        option_text: opt.text,
+        is_correct: opt.is_correct,
+        story_consequence: opt.story_consequence
+      }))
+    };
+
     setIsSaving(true);
     try {
       if (editingQuestionId) {
-        await api.updateQuestion(editingQuestionId, questionForm);
+        await api.updateQuestion(editingQuestionId, payload);
         toast.success('Question updated');
       } else {
-        await api.createQuestion(quizId, questionForm);
+        await api.createQuestion(quizId, payload);
         toast.success('Question added');
       }
       
@@ -128,7 +141,12 @@ export default function QuizBuilder() {
       setQuestionForm(getInitialQuestionForm());
       fetchQuizAndQuestions();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to save question');
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        toast.error('Validation Error: Please check inputs');
+      } else {
+        toast.error(detail || 'Failed to save question');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -138,12 +156,12 @@ export default function QuizBuilder() {
     setEditingQuestionId(q.id);
     setIsAddingQuestion(false);
     setQuestionForm({
-      text: q.text,
+      text: q.question_text,
       marks: q.marks,
       difficulty: q.difficulty || 'MEDIUM',
       explanation: q.explanation || '',
       story_context: q.story_context || '',
-      options: q.options.map(opt => ({ text: opt.text, is_correct: opt.is_correct, story_consequence: opt.story_consequence || '' }))
+      options: q.options.map(opt => ({ text: opt.option_text, is_correct: opt.is_correct, story_consequence: opt.story_consequence || '' }))
     });
   };
 
@@ -268,7 +286,7 @@ export default function QuizBuilder() {
                   <div className="flex justify-between items-start gap-4 mb-4">
                     <div className="flex gap-3 items-start">
                       <span className="text-lg font-bold text-slate-500 mt-1">Q{index + 1}.</span>
-                      <h3 className="text-xl font-bold text-white leading-relaxed">{q.text}</h3>
+                      <h3 className="text-xl font-bold text-white leading-relaxed">{q.question_text}</h3>
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button onClick={() => handleEditClick(q)} className="p-2 text-slate-400 hover:text-[var(--color-primary-light)] hover:bg-indigo-500/20 rounded-lg transition-colors">
@@ -297,7 +315,7 @@ export default function QuizBuilder() {
                         }`}>
                           {opt.is_correct && <Check className="w-4 h-4" />}
                         </div>
-                        <span className={`font-medium ${opt.is_correct ? 'text-emerald-400' : 'text-slate-300'}`}>{opt.text}</span>
+                        <span className={`font-medium ${opt.is_correct ? 'text-emerald-400' : 'text-slate-300'}`}>{opt.option_text}</span>
                       </div>
                     ))}
                   </div>

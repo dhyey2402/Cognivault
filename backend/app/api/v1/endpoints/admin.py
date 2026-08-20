@@ -97,7 +97,7 @@ def get_dashboard_analytics(
         q_pass_rate = (q.passed_count / q.attempts * 100) if q.attempts and q.attempts > 0 else 0
         quiz_intelligence.append({
             "name": q.title,
-            "status": q.status.value,
+            "status": q.status.value if q.status else "DRAFT",
             "attempts": q.attempts,
             "average_score": round(q.avg_score, 2) if q.avg_score else 0,
             "pass_rate": round(q_pass_rate, 2)
