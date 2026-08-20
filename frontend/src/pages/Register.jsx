@@ -6,6 +6,7 @@ import { UserPlus, Rocket, GraduationCap, Star, Book, CheckCircle, BrainCircuit 
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+import { getErrorMessage } from '../utils/error';
 export default function Register() {
   const { register, handleSubmit, formState: { errors }, watch } = useForm();
   const { register: registerUser } = useAuth();
@@ -42,7 +43,7 @@ export default function Register() {
       toast.success('Account created successfully!');
       navigate('/login');
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to register');
+      toast.error(getErrorMessage(err));
       document.getElementById('register-form').classList.add('animate-shake');
       setTimeout(() => {
         document.getElementById('register-form')?.classList.remove('animate-shake');

@@ -4,6 +4,7 @@ import { Plus, Edit2, Trash2, Tags, FolderOpen, Loader2, Image as ImageIcon } fr
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+import { getErrorMessage } from '../../utils/error';
 export default function CategoryManagement() {
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,7 +79,7 @@ export default function CategoryManagement() {
       handleCloseModal();
       fetchCategories();
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to save category');
+      toast.error(getErrorMessage(err));
     } finally {
       setIsSubmitting(false);
     }

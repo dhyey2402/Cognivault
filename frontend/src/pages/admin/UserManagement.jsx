@@ -4,6 +4,7 @@ import { Search, Filter, Download, MoreHorizontal, UserCheck, UserX, User, Shiel
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+import { getErrorMessage } from '../../utils/error';
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +35,7 @@ export default function UserManagement() {
       ));
       toast.success('User status updated');
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to update user status');
+      toast.error(getErrorMessage(err));
     }
   };
 

@@ -6,6 +6,7 @@ import { LogIn, BrainCircuit, Lightbulb, Trophy, Target, Eye, EyeOff } from 'luc
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
+import { getErrorMessage } from '../utils/error';
 export default function Login() {
   const storedEmail = localStorage.getItem('rememberedEmail');
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -41,7 +42,7 @@ export default function Login() {
         navigate('/dashboard');
       }
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Failed to login');
+      toast.error(getErrorMessage(err));
       // trigger shake animation
       document.getElementById('login-form').classList.add('animate-shake');
       setTimeout(() => {

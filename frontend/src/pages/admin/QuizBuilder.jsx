@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../../services/api';
 import { ArrowLeft, Plus, Save, Trash2, GripVertical, CheckCircle2, Copy, Check, Lightbulb, Edit2, ShieldAlert } from 'lucide-react';
+import { getErrorMessage } from '../../utils/error';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -141,12 +142,7 @@ export default function QuizBuilder() {
       setQuestionForm(getInitialQuestionForm());
       fetchQuizAndQuestions();
     } catch (err) {
-      const detail = err.response?.data?.detail;
-      if (Array.isArray(detail)) {
-        toast.error('Validation Error: Please check inputs');
-      } else {
-        toast.error(detail || 'Failed to save question');
-      }
+      toast.error(getErrorMessage(err));
     } finally {
       setIsSaving(false);
     }

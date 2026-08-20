@@ -23,7 +23,7 @@ export default function JoinQuiz() {
         navigate(`/quizzes/${quizDetails.id}`);
       }, 1000);
     } catch (err) {
-      toast.error(err.response?.data?.detail || 'Invalid join code');
+      toast.error(getErrorMessage(err));
       navigate('/dashboard');
     }
   };
