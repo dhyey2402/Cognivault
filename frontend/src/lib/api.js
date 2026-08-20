@@ -1,8 +1,12 @@
 import axios from 'axios';
 
+const getBaseUrl = () => {
+  const url = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  return url.endsWith('/') ? url.slice(0, -1) : url;
+};
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1` : 'http://localhost:8000/api/v1',
-  headers: {
+  baseURL: `${getBaseUrl()}/api/v1`,  headers: {
     'Content-Type': 'application/json',
   },
   withCredentials: true,
@@ -61,7 +65,7 @@ api.interceptors.response.use(
       isRefreshing = true;
       
       try {
-        const refreshUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1/auth/refresh` : 'http://localhost:8000/api/v1/auth/refresh';
+        const refreshUrl = `${getBaseUrl()}/api/v1/auth/refresh`;
         const response = await axios.post(refreshUrl, {}, {
           withCredentials: true
         });

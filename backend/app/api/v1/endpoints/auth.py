@@ -75,6 +75,8 @@ def login_access_token(
     refresh_expires_delta = timedelta(days=60) if remember_me else timedelta(days=1)
     refresh_token = create_refresh_token(user.id, expires_delta=refresh_expires_delta)
     
+    max_age_val = int(refresh_expires_delta.total_seconds()) if remember_me else None
+
     # Set the refresh token as an HttpOnly cookie
     response.set_cookie(
         key="refresh_token",
@@ -82,7 +84,7 @@ def login_access_token(
         httponly=True,
         secure=True,
         samesite="none",
-        max_age=int(refresh_expires_delta.total_seconds())
+        max_age=max_age_val
     )
     
     return {

@@ -47,11 +47,12 @@ def get_leaderboard(
 
     leaderboard = []
     for rank, row in enumerate(results, start=1):
+        avg_score = round(row.average_score, 2) if row.average_score is not None else 0.0
         leaderboard.append(LeaderboardEntry(
             rank=rank,
             user_id=row.user_id,
             student_name=row.student_name,
-            average_score=round(row.average_score, 2),
+            average_score=avg_score,
             quizzes_completed=row.quizzes_completed
         ))
 

@@ -12,7 +12,9 @@ export function AuthProvider({ children }) {
     const initAuth = async () => {
       try {
         // Try to refresh token on initial load
-        const refreshUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1/auth/refresh` : 'http://localhost:8000/api/v1/auth/refresh';
+        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+        const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+        const refreshUrl = `${cleanBaseUrl}/api/v1/auth/refresh`;
         const response = await axios.post(refreshUrl, {}, {
           withCredentials: true
         });
