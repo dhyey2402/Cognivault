@@ -12,14 +12,14 @@ export default function CategoryManagement() {
   const [formData, setFormData] = useState({ name: '', description: '', color: 'bg-indigo-500', icon: 'FolderOpen' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Predefined colors and icons for the redesigned cards
+  // Predefined colors and icons for the redesigned cards (dark mode compatible)
   const colorOptions = [
-    { name: 'Indigo', class: 'bg-indigo-500', light: 'bg-indigo-50', text: 'text-indigo-600', border: 'border-indigo-200' },
-    { name: 'Rose', class: 'bg-rose-500', light: 'bg-rose-50', text: 'text-rose-600', border: 'border-rose-200' },
-    { name: 'Emerald', class: 'bg-emerald-500', light: 'bg-emerald-50', text: 'text-emerald-600', border: 'border-emerald-200' },
-    { name: 'Amber', class: 'bg-amber-500', light: 'bg-amber-50', text: 'text-amber-600', border: 'border-amber-200' },
-    { name: 'Sky', class: 'bg-sky-500', light: 'bg-sky-50', text: 'text-sky-600', border: 'border-sky-200' },
-    { name: 'Purple', class: 'bg-purple-500', light: 'bg-purple-50', text: 'text-purple-600', border: 'border-purple-200' },
+    { name: 'Indigo', class: 'bg-indigo-500', light: 'bg-indigo-500/10', text: 'text-indigo-400', border: 'border-indigo-500/20' },
+    { name: 'Rose', class: 'bg-rose-500', light: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/20' },
+    { name: 'Emerald', class: 'bg-emerald-500', light: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
+    { name: 'Amber', class: 'bg-amber-500', light: 'bg-amber-500/10', text: 'text-amber-400', border: 'border-amber-500/20' },
+    { name: 'Sky', class: 'bg-sky-500', light: 'bg-sky-500/10', text: 'text-sky-400', border: 'border-sky-500/20' },
+    { name: 'Purple', class: 'bg-purple-500', light: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20' },
   ];
 
   const iconOptions = ['FolderOpen', 'Code', 'Calculator', 'FlaskConical', 'Globe', 'Palette', 'Book', 'Cpu'];
@@ -96,13 +96,13 @@ export default function CategoryManagement() {
   };
 
   return (
-    <div className="space-y-8 animate-fade-in pb-12">
+    <div className="space-y-8 animate-fade-in pb-12 relative z-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
             <Tags className="w-8 h-8 text-[var(--color-primary)]" /> Categories
           </h1>
-          <p className="text-slate-500 mt-1">Organize quizzes by subject or topic.</p>
+          <p className="text-slate-400 mt-1">Organize quizzes by subject or topic.</p>
         </div>
         <button
           onClick={() => handleOpenModal()}
@@ -115,14 +115,14 @@ export default function CategoryManagement() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1,2,3].map(i => (
-            <div key={i} className="bg-white rounded-3xl h-64 border border-slate-100 p-6 flex flex-col justify-between">
+            <div key={i} className="glass-panel rounded-3xl h-64 border border-white/10 p-6 flex flex-col justify-between">
               <div>
-                <div className="w-12 h-12 bg-slate-100 rounded-xl mb-4 animate-pulse"></div>
-                <div className="w-3/4 h-6 bg-slate-100 rounded-md animate-pulse mb-3"></div>
-                <div className="w-full h-4 bg-slate-50 rounded-md animate-pulse"></div>
+                <div className="w-12 h-12 bg-white/10 rounded-xl mb-4 animate-pulse"></div>
+                <div className="w-3/4 h-6 bg-white/10 rounded-md animate-pulse mb-3"></div>
+                <div className="w-full h-4 bg-white/5 rounded-md animate-pulse"></div>
               </div>
-              <div className="border-t border-slate-100 pt-4 mt-6">
-                <div className="w-full h-8 bg-slate-50 rounded-lg animate-pulse"></div>
+              <div className="border-t border-white/10 pt-4 mt-6">
+                <div className="w-full h-8 bg-white/5 rounded-lg animate-pulse"></div>
               </div>
             </div>
           ))}
@@ -137,7 +137,7 @@ export default function CategoryManagement() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 key={category.id}
-                className={`group relative bg-white rounded-3xl shadow-sm hover:shadow-xl border-2 border-transparent hover:${visuals.border} overflow-hidden transition-all duration-300 flex flex-col h-full hover:-translate-y-1`}
+                className={`group relative glass-panel rounded-3xl shadow-sm hover:shadow-glow border border-white/10 hover:${visuals.border} overflow-hidden transition-all duration-300 flex flex-col h-full hover:-translate-y-1`}
               >
                 {/* Background Tint */}
                 <div className={`absolute inset-0 ${visuals.light} opacity-0 group-hover:opacity-30 transition-opacity duration-300`}></div>
@@ -147,26 +147,24 @@ export default function CategoryManagement() {
                     <FolderOpen className="w-6 h-6" />
                   </div>
                   
-                  <h2 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                  <h2 className="text-xl font-bold text-white mb-2 group-hover:text-cyan-400 transition-colors">
                     {category.name}
                   </h2>
                   
-                  <p className="text-slate-500 text-sm line-clamp-2 flex-1 mb-6">
+                  <p className="text-slate-400 text-sm line-clamp-2 flex-1 mb-6">
                     {category.description || 'No description provided.'}
                   </p>
                   
-
-                  
-                  <div className="pt-5 border-t border-slate-100 flex items-center justify-between mt-auto">
+                  <div className="pt-5 border-t border-white/10 flex items-center justify-between mt-auto">
                     <button
                       onClick={() => handleOpenModal(category)}
-                      className="text-sm font-bold text-slate-500 hover:text-indigo-600 flex items-center gap-1.5 transition-colors bg-slate-50 hover:bg-indigo-50 px-3 py-1.5 rounded-lg"
+                      className="text-sm font-bold text-slate-400 hover:text-indigo-400 flex items-center gap-1.5 transition-colors bg-white/5 hover:bg-indigo-500/10 px-3 py-1.5 rounded-lg"
                     >
                       <Edit2 className="w-4 h-4" /> Edit
                     </button>
                     <button
                       onClick={() => handleDelete(category.id)}
-                      className="text-sm font-bold text-slate-500 hover:text-red-600 flex items-center gap-1.5 transition-colors bg-slate-50 hover:bg-red-50 px-3 py-1.5 rounded-lg"
+                      className="text-sm font-bold text-slate-400 hover:text-red-400 flex items-center gap-1.5 transition-colors bg-white/5 hover:bg-red-500/10 px-3 py-1.5 rounded-lg"
                     >
                       <Trash2 className="w-4 h-4" /> Delete
                     </button>
@@ -177,12 +175,12 @@ export default function CategoryManagement() {
           })}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200 shadow-sm">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-slate-50 mb-6">
+        <div className="text-center py-20 glass-panel rounded-3xl border border-dashed border-white/20 shadow-sm">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/5 mb-6">
             <FolderOpen className="w-10 h-10 text-[var(--color-primary-light)] opacity-50" />
           </div>
-          <h3 className="text-2xl font-extrabold text-slate-900 mb-2">No categories yet</h3>
-          <p className="text-slate-500 mb-8 max-w-md mx-auto">Create your first category to start organizing quizzes and content effectively.</p>
+          <h3 className="text-2xl font-extrabold text-white mb-2">No categories yet</h3>
+          <p className="text-slate-400 mb-8 max-w-md mx-auto">Create your first category to start organizing quizzes and content effectively.</p>
           <button
             onClick={() => handleOpenModal()}
             className="bg-[var(--color-primary)] text-white px-6 py-3 rounded-xl font-bold hover:bg-[var(--color-primary-light)] shadow-sm hover:shadow-glow transition-all active:scale-[0.98] inline-flex items-center gap-2"
@@ -198,7 +196,7 @@ export default function CategoryManagement() {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
               onClick={handleCloseModal}
             ></motion.div>
             
@@ -206,39 +204,39 @@ export default function CategoryManagement() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="bg-white rounded-3xl p-8 max-w-lg w-full relative z-10 shadow-2xl border border-slate-100"
+              className="glass-panel bg-slate-900 rounded-3xl p-8 max-w-lg w-full relative z-10 shadow-glow border border-white/10"
             >
-              <h2 className="text-2xl font-extrabold text-slate-900 mb-6 tracking-tight">
+              <h2 className="text-2xl font-extrabold text-white mb-6 tracking-tight">
                 {editingCategory ? 'Edit Category' : 'New Category'}
               </h2>
               
               <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Category Name</label>
+                  <label className="block text-sm font-bold text-slate-300 mb-2">Category Name</label>
                   <input
                     type="text"
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-[var(--color-primary)] focus:ring-0 transition-colors font-medium text-slate-900"
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl focus:border-[var(--color-primary)] focus:ring-0 transition-colors font-medium text-white"
                     placeholder="e.g. Computer Science"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-2">Description (Optional)</label>
+                  <label className="block text-sm font-bold text-slate-300 mb-2">Description (Optional)</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     rows="3"
-                    className="w-full px-4 py-3 bg-slate-50 border-2 border-slate-200 rounded-xl focus:border-[var(--color-primary)] focus:ring-0 transition-colors font-medium text-slate-900 resize-none"
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-white/10 rounded-xl focus:border-[var(--color-primary)] focus:ring-0 transition-colors font-medium text-white resize-none"
                     placeholder="What is this category about?"
                   ></textarea>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                    <ImageIcon className="w-4 h-4 text-slate-400" /> Color Accent
+                  <label className="block text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-slate-500" /> Color Accent
                   </label>
                   <div className="flex gap-3">
                     {colorOptions.map(color => (
@@ -247,7 +245,7 @@ export default function CategoryManagement() {
                         type="button"
                         onClick={() => setFormData({ ...formData, color: color.class })}
                         className={`w-10 h-10 rounded-full ${color.class} flex items-center justify-center transition-all ${
-                          formData.color === color.class ? 'ring-4 ring-offset-2 ring-[var(--color-primary)] scale-110' : 'hover:scale-110 opacity-70 hover:opacity-100'
+                          formData.color === color.class ? 'ring-4 ring-offset-2 ring-[var(--color-primary)] ring-offset-slate-900 scale-110' : 'hover:scale-110 opacity-70 hover:opacity-100'
                         }`}
                         title={color.name}
                       />
@@ -255,11 +253,11 @@ export default function CategoryManagement() {
                   </div>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-slate-100">
+                <div className="flex justify-end gap-3 pt-6 mt-6 border-t border-white/10">
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="px-5 py-3 text-slate-600 font-bold bg-white border-2 border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                    className="px-5 py-3 text-slate-300 font-bold bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:text-white transition-colors"
                   >
                     Cancel
                   </button>

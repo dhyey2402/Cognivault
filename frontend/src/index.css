@@ -56,6 +56,18 @@
   to { stroke-dashoffset: var(--target-offset); }
 }
 
+/* New CSS Background Animations */
+@keyframes float-node {
+  0% { transform: translateY(0) scale(1) translateZ(0); opacity: 0.6; }
+  50% { transform: translateY(-30px) scale(1.1) translateZ(0); opacity: 1; }
+  100% { transform: translateY(0) scale(1) translateZ(0); opacity: 0.6; }
+}
+
+@keyframes grid-move {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 40px; } /* matches grid size */
+}
+
 @utility animate-fade-in {
   animation: fade-in 0.3s var(--ease-decel) forwards;
 }
@@ -70,6 +82,16 @@
 
 @utility animate-pulse-glow {
   animation: pulse-glow 3s infinite ease-in-out;
+}
+
+@utility animate-float-node {
+  animation: float-node 8s infinite ease-in-out;
+  will-change: transform, opacity;
+}
+
+@utility animate-grid-move {
+  animation: grid-move 2s infinite linear;
+  will-change: background-position;
 }
 
 @utility glass-panel {

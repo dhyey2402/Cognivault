@@ -1,249 +1,157 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function SpatialBackground() {
-  const canvasRef = useRef(null);
+  const containerRef = useRef(null);
+  const parallaxRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
+  const [performanceTier, setPerformanceTier] = useState('high'); // 'high', 'low'
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d', { alpha: false });
-    
-    // Config
+    // 1. Capability Detection
     const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isMobile = window.innerWidth < 768;
+    // Conservative check: if less than 4 cores or mobile, go to low-tier
+    const hwConcurrency = navigator.hardwareConcurrency || 4;
     
-    const FOCAL_LENGTH = isMobile ? 500 : 800; 
-    const CAMERA_Z = -500;
-    
-    const GRID_COLS = isMobile ? 25 : 55;
-    const GRID_ROWS = isMobile ? 30 : 65;
-    const GRID_SPACING_X = isMobile ? 200 : 160;
-    const GRID_SPACING_Z = isMobile ? 250 : 200;
-    const START_Z = 200;
-    const SPEED = isReducedMotion ? 0 : 2.5;
+    if (isReducedMotion || isMobile || hwConcurrency < 4) {
+      setPerformanceTier('low');
+    }
 
-    let width = window.innerWidth;
-    let height = window.innerHeight;
+    // 2. Intersection Observer to pause when not visible
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0 } // Any part visible = active
+    );
+    
+    if (containerRef.current) {
+      observer.observe(containerRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
+  // 3. Parallax Mouse Listener
+  useEffect(() => {
+    if (performanceTier === 'low' || !isVisible) return;
+
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
     let animationFrameId;
-    let time = 0;
-    let zOffset = 0;
-    
-    // Parallax
-    let targetCamX = 0;
-    let targetCamY = 0;
-    let camX = 0;
-    let camY = 0;
 
-    // Pseudo-random hash to keep nodes statically pinned to the flowing terrain
-    const hash = (x, z) => {
-      let h = Math.sin(x * 12.9898 + z * 78.233) * 43758.5453;
-      return h - Math.floor(h);
-    };
-
-    const getElevation = (gx, gz, t) => {
-      // gx and gz are world coordinates
-      // Wave 1: large sweeping organic hills
-      const w1 = Math.sin(gx * 0.0008 + t * 0.4) * Math.cos(gz * 0.0008 + t * 0.3) * 400;
-      // Wave 2: medium disruptive details
-      const w2 = Math.sin(gx * 0.002 - t * 0.6) * Math.sin(gz * 0.002 + t * 0.5) * 150;
-      // Wave 3: central valley (pushes the terrain down in the center so UI remains readable)
-      const valleyFactor = Math.exp(-(gx * gx) / 1500000);
-      
-      // Base elevation + waves + deep central valley
-      return 250 + w1 + w2 + (valleyFactor * 300);
-    };
-
-    const project = (x, y, z) => {
-      const relX = x - camX;
-      const relY = y - camY;
-      const relZ = z - CAMERA_Z;
-
-      if (relZ <= 0) return null;
-
-      const scale = FOCAL_LENGTH / relZ;
-      const screenX = width / 2 + relX * scale;
-      const screenY = height / 2 + relY * scale;
-
-      return { x: screenX, y: screenY, scale, z: relZ };
-    };
-
-    const handleResize = () => {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    };
-    
     const handleMouseMove = (e) => {
-      if (isReducedMotion || isMobile) return;
-      // Parallax mapped to a spatial shift
-      targetCamX = ((e.clientX / width) - 0.5) * 1000;
-      targetCamY = ((e.clientY / height) - 0.5) * 350;
+      // Small clamped shift (e.g., -15px to +15px)
+      const xPercent = (e.clientX / window.innerWidth) - 0.5;
+      const yPercent = (e.clientY / window.innerHeight) - 0.5;
+      targetX = xPercent * -30; // Inverse movement
+      targetY = yPercent * -20;
     };
 
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('mousemove', handleMouseMove);
-    handleResize();
-
-    const draw = () => {
-      time += 0.016;
-      zOffset = (zOffset + SPEED) % GRID_SPACING_Z;
-
-      camX += (targetCamX - camX) * 0.03;
-      camY += (targetCamY - camY) * 0.03;
-
-      // Base background (very deep navy/black)
-      ctx.fillStyle = '#020617'; 
-      ctx.fillRect(0, 0, width, height);
-
-      const halfCols = Math.floor(GRID_COLS / 2);
-
-      // 1. Pre-calculate the grid points for this frame
-      const grid = [];
-      for (let r = 0; r <= GRID_ROWS; r++) {
-        const row = [];
-        const worldZ = START_Z + r * GRID_SPACING_Z - zOffset;
+    const updateParallax = () => {
+      if (parallaxRef.current) {
+        // Smooth interpolation
+        currentX += (targetX - currentX) * 0.05;
+        currentY += (targetY - currentY) * 0.05;
         
-        for (let c = 0; c <= GRID_COLS; c++) {
-          const worldX = (c - halfCols) * GRID_SPACING_X;
-          const worldY = getElevation(worldX, worldZ, time);
-          
-          const p = project(worldX, worldY, worldZ);
-          
-          // Determine if this intersection hosts a knowledge node
-          const gridZId = Math.round(worldZ / GRID_SPACING_Z);
-          const gridXId = c;
-          
-          const isNode = hash(gridXId, gridZId) > (isMobile ? 0.95 : 0.92);
-          const nodeType = isNode ? Math.floor(hash(gridXId + 1, gridZId) * 3) : 0;
-          
-          row.push({ p, isNode, nodeType, worldZ, worldX });
-        }
-        grid.push(row);
+        parallaxRef.current.style.setProperty('--px', `${currentX}px`);
+        parallaxRef.current.style.setProperty('--py', `${currentY}px`);
       }
-
-      // 2. Draw quads back-to-front (Painter's Algorithm for occlusion)
-      const maxZ = START_Z + GRID_ROWS * GRID_SPACING_Z;
-      
-      for (let r = GRID_ROWS - 1; r >= 0; r--) {
-        for (let c = 0; c < GRID_COLS; c++) {
-          const p1 = grid[r][c];
-          const p2 = grid[r][c+1];
-          const p3 = grid[r+1][c+1];
-          const p4 = grid[r+1][c];
-
-          // Skip if quad is behind camera
-          if (!p1.p || !p2.p || !p3.p || !p4.p) continue;
-
-          // Depth based alpha calculation
-          const avgZ = (p1.worldZ + p2.worldZ + p3.worldZ + p4.worldZ) / 4;
-          const depthRatio = Math.max(0, 1 - (avgZ / maxZ));
-          
-          // Exponential fade for smooth horizon blend
-          const alpha = Math.pow(depthRatio, 1.8); 
-          
-          if (alpha < 0.02) continue; // cull invisible geometry
-
-          // Draw the physical quad
-          ctx.beginPath();
-          ctx.moveTo(p1.p.x, p1.p.y);
-          ctx.lineTo(p2.p.x, p2.p.y);
-          ctx.lineTo(p3.p.x, p3.p.y);
-          ctx.lineTo(p4.p.x, p4.p.y);
-          ctx.closePath();
-
-          // Fill with base color to occlude lines behind it (solid terrain illusion)
-          ctx.fillStyle = '#020617';
-          ctx.fill();
-
-          // Highlight center paths for visual structure
-          const isCenter = Math.abs(c - halfCols) < 4;
-          
-          // Dynamic data pulses flowing down the grid lines
-          const pulseHash = hash(c, 0);
-          const isPulseCol = pulseHash > 0.85;
-          const pulseZ = (time * 1800 * pulseHash) % maxZ;
-          const distToPulse = Math.abs(avgZ - pulseZ);
-          const pulseGlow = isPulseCol && distToPulse < 1000 ? 1 - (distToPulse / 1000) : 0;
-
-          if (pulseGlow > 0 && !isReducedMotion) {
-            ctx.strokeStyle = `rgba(139, 92, 246, ${alpha * 0.9 + pulseGlow * 0.6})`; // Electric violet pulse
-            ctx.lineWidth = 1.5;
-          } else {
-            ctx.strokeStyle = `rgba(49, 46, 129, ${alpha * (isCenter ? 0.6 : 0.25)})`; // Deep indigo grid
-            ctx.lineWidth = 1;
-          }
-          
-          ctx.stroke();
-
-          // Draw Nodes at the front-left vertex
-          if (p1.isNode) {
-            const screenRadius = Math.max(0.5, 3.5 * p1.p.scale);
-            ctx.beginPath();
-            ctx.arc(p1.p.x, p1.p.y, screenRadius, 0, Math.PI * 2);
-            
-            if (p1.nodeType === 0) {
-              ctx.fillStyle = `rgba(14, 165, 233, ${alpha})`; // Cyan
-            } else if (p1.nodeType === 1) {
-              ctx.fillStyle = `rgba(168, 85, 247, ${alpha})`; // Magenta/Purple
-            } else {
-              ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`; // Bright Core
-            }
-            ctx.fill();
-
-            // Glow for foreground nodes
-            if (alpha > 0.3 && !isMobile && !isReducedMotion) {
-              ctx.shadowBlur = 15;
-              ctx.shadowColor = ctx.fillStyle;
-              ctx.beginPath();
-              ctx.arc(p1.p.x, p1.p.y, screenRadius * 1.5, 0, Math.PI * 2);
-              ctx.fillStyle = `rgba(255,255,255,${alpha * 0.6})`;
-              ctx.fill();
-              ctx.shadowBlur = 0;
-            }
-          }
-        }
-      }
-
-      // 3. Volumetric Atmospheric Fog & UI Contrast Layer
-      const cx = width / 2;
-      const cy = height / 2;
-      
-      // Radial vignette to darken edges and keep focus centered
-      const vignette = ctx.createRadialGradient(cx, cy, height * 0.2, cx, cy, Math.max(width, height) * 0.85);
-      vignette.addColorStop(0, 'rgba(2, 6, 23, 0)'); // clear center
-      vignette.addColorStop(1, 'rgba(2, 6, 23, 0.92)'); // dark edges
-      ctx.fillStyle = vignette;
-      ctx.fillRect(0, 0, width, height);
-
-      // Linear horizon fog to smoothly blend the distant terrain into the sky
-      const horizon = ctx.createLinearGradient(0, 0, 0, height);
-      horizon.addColorStop(0, 'rgba(2, 6, 23, 1)'); // completely opaque sky
-      horizon.addColorStop(0.35, 'rgba(2, 6, 23, 0.8)'); // dense horizon mist
-      horizon.addColorStop(0.7, 'rgba(2, 6, 23, 0)'); // clear foreground
-      ctx.fillStyle = horizon;
-      ctx.fillRect(0, 0, width, height);
-      
-      // Subtle darkening overlay to ensure UI elements (cards/text) remain readable
-      ctx.fillStyle = 'rgba(2, 6, 23, 0.3)';
-      ctx.fillRect(0, 0, width, height);
-
-      animationFrameId = requestAnimationFrame(draw);
+      animationFrameId = requestAnimationFrame(updateParallax);
     };
 
-    draw();
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    animationFrameId = requestAnimationFrame(updateParallax);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
       window.removeEventListener('mousemove', handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [performanceTier, isVisible]);
+
+  // If we are paused/invisible, we can set play-state to paused via a class
+  const isPaused = !isVisible || performanceTier === 'low';
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 w-full h-full pointer-events-none -z-10"
-    />
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 w-full h-full pointer-events-none -z-10 bg-[#020617] overflow-hidden"
+    >
+      {/* Deep Atmosphere Base */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(30,27,75,0.6)_0%,rgba(2,6,23,0)_70%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom,rgba(14,165,233,0.1)_0%,rgba(2,6,23,0)_50%)]"></div>
+      
+      {/* Parallax Container */}
+      <div 
+        ref={parallaxRef}
+        className="absolute inset-0 transition-transform duration-75 will-change-transform"
+        style={{ transform: 'translate3d(var(--px, 0), var(--py, 0), 0)' }}
+      >
+        {/* Layer 2: Perspective Grid */}
+        <div 
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[200vw] h-[100vh]"
+          style={{
+            perspective: '1000px',
+            transformStyle: 'preserve-3d'
+          }}
+        >
+          {/* The actual receding plane */}
+          <div 
+            className="absolute bottom-0 w-full h-[150%] origin-bottom"
+            style={{
+              transform: 'rotateX(75deg) scale(1.5)',
+              // The Grid Pattern
+              backgroundImage: `
+                linear-gradient(rgba(99,102,241,0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99,102,241,0.15) 1px, transparent 1px)
+              `,
+              backgroundSize: '60px 60px',
+              backgroundPosition: 'center bottom',
+              // Fade out into the horizon (top) and edges
+              maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%), radial-gradient(circle at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%)',
+              WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%)',
+              // Conditionally animate if not paused
+              animation: isPaused ? 'none' : 'grid-move 4s linear infinite',
+              animationPlayState: isPaused ? 'paused' : 'running'
+            }}
+          ></div>
+        </div>
+
+        {/* Layer 3: Ambient Nodes (Only on High Performance Tier) */}
+        {performanceTier === 'high' && (
+          <div className="absolute inset-0">
+            {/* Cyan Node */}
+            <div 
+              className="absolute left-[30%] top-[40%] w-2 h-2 bg-cyan-400 rounded-full shadow-[0_0_20px_4px_rgba(34,211,238,0.5)]"
+              style={{
+                animation: isPaused ? 'none' : 'float-node 8s ease-in-out infinite',
+                animationDelay: '0s'
+              }}
+            ></div>
+            {/* Violet Node */}
+            <div 
+              className="absolute right-[25%] top-[60%] w-3 h-3 bg-violet-400 rounded-full shadow-[0_0_20px_6px_rgba(167,139,250,0.5)]"
+              style={{
+                animation: isPaused ? 'none' : 'float-node 10s ease-in-out infinite',
+                animationDelay: '2s'
+              }}
+            ></div>
+            {/* Far Deep Blue Node */}
+            <div 
+              className="absolute left-[60%] top-[30%] w-1.5 h-1.5 bg-blue-500 rounded-full shadow-[0_0_15px_3px_rgba(59,130,246,0.5)] blur-[1px] opacity-60"
+              style={{
+                animation: isPaused ? 'none' : 'float-node 12s ease-in-out infinite',
+                animationDelay: '5s'
+              }}
+            ></div>
+          </div>
+        )}
+      </div>
+      
+      {/* Subtle UI Contrast Overlay */}
+      <div className="absolute inset-0 bg-slate-950/20 backdrop-blur-[1px]"></div>
+    </div>
   );
 }

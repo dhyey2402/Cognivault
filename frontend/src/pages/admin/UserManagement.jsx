@@ -66,31 +66,31 @@ export default function UserManagement() {
   const inactiveCount = users.length - activeCount;
 
   return (
-    <div className="space-y-6 animate-fade-in pb-20">
+    <div className="space-y-6 animate-fade-in pb-20 relative z-10">
       
       {/* Header */}
-      <div className="bg-white p-6 md:p-8 rounded-3xl shadow-card border border-slate-100 flex flex-col gap-6 relative overflow-hidden">
+      <div className="glass-panel p-6 md:p-8 rounded-3xl border border-white/10 flex flex-col gap-6 relative overflow-hidden">
         {/* Subtle mesh background in corner */}
-        <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-60"></div>
+        <div className="absolute -top-20 -right-20 w-64 h-64 bg-[var(--color-primary)] rounded-full blur-3xl opacity-20"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <User className="w-6 h-6 text-[var(--color-primary)]" /> Students
+            <h1 className="text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+              <User className="w-6 h-6 text-[var(--color-primary-light)]" /> Students
             </h1>
-            <p className="text-slate-500 mt-1">Manage and monitor student accounts</p>
+            <p className="text-slate-400 mt-1">Manage and monitor student accounts</p>
           </div>
           
-          <button className="px-4 py-2 bg-white border border-slate-200 text-slate-600 font-bold rounded-xl shadow-sm hover:bg-slate-50 hover:border-slate-300 transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-white/5 border border-white/10 text-slate-300 font-bold rounded-xl shadow-sm hover:bg-white/10 hover:text-white transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" /> Export CSV
           </button>
         </div>
 
         <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex gap-2 text-sm">
-            <div className="px-3 py-1.5 bg-slate-100 text-slate-700 rounded-lg font-medium">Total: <b>{users.length}</b></div>
-            <div className="px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-lg font-medium">Active: <b>{activeCount}</b></div>
-            <div className="px-3 py-1.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-lg font-medium">Inactive: <b>{inactiveCount}</b></div>
+            <div className="px-3 py-1.5 bg-white/10 text-white rounded-lg font-medium">Total: <b>{users.length}</b></div>
+            <div className="px-3 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg font-medium">Active: <b>{activeCount}</b></div>
+            <div className="px-3 py-1.5 bg-slate-900/50 text-slate-400 border border-white/10 rounded-lg font-medium">Inactive: <b>{inactiveCount}</b></div>
           </div>
 
           <div className="flex w-full sm:w-auto items-center gap-3">
@@ -101,13 +101,13 @@ export default function UserManagement() {
                 placeholder="Search students..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-9 pr-4 py-2 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-[var(--color-primary)] transition-colors text-sm"
+                className="w-full pl-9 pr-4 py-2 bg-slate-900/50 border border-white/10 rounded-xl focus:outline-none focus:border-[var(--color-primary-light)] text-white transition-colors text-sm"
               />
             </div>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="py-2 pl-3 pr-8 border-2 border-slate-200 rounded-xl focus:ring-0 focus:border-[var(--color-primary)] text-sm font-medium text-slate-700 bg-white"
+              className="py-2 pl-3 pr-8 bg-slate-900/50 border border-white/10 rounded-xl focus:outline-none focus:border-[var(--color-primary-light)] text-sm font-medium text-slate-300"
             >
               <option value="All">All Status</option>
               <option value="Active">Active</option>
@@ -118,17 +118,17 @@ export default function UserManagement() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-3xl shadow-card border border-slate-100 overflow-hidden">
+      <div className="glass-panel rounded-3xl border border-white/10 overflow-hidden">
         <div className="overflow-x-auto custom-scrollbar">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
+              <tr className="bg-white/5 border-b border-white/10">
                 <th className="px-6 py-4 w-12">
                   <input 
                     type="checkbox" 
                     checked={selectedUsers.length === filteredUsers.length && filteredUsers.length > 0}
                     onChange={handleSelectAll}
-                    className="w-4 h-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                    className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-[var(--color-primary-light)] focus:ring-[var(--color-primary-light)]"
                   />
                 </th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">Student</th>
@@ -138,21 +138,21 @@ export default function UserManagement() {
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-white/5">
               {isLoading ? (
                 // Skeleton Rows
                 [...Array(5)].map((_, i) => (
                   <tr key={i} className="animate-pulse">
-                    <td className="px-6 py-5"><div className="w-4 h-4 bg-slate-200 rounded"></div></td>
+                    <td className="px-6 py-5"><div className="w-4 h-4 bg-white/10 rounded"></div></td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-slate-200 rounded-full"></div>
-                        <div className="w-32 h-4 bg-slate-200 rounded"></div>
+                        <div className="w-10 h-10 bg-white/10 rounded-full"></div>
+                        <div className="w-32 h-4 bg-white/10 rounded"></div>
                       </div>
                     </td>
-                    <td className="px-6 py-5"><div className="w-48 h-4 bg-slate-200 rounded"></div></td>
-                    <td className="px-6 py-5"><div className="w-20 h-6 bg-slate-200 rounded-full"></div></td>
-                    <td className="px-6 py-5"><div className="w-24 h-4 bg-slate-200 rounded"></div></td>
+                    <td className="px-6 py-5"><div className="w-48 h-4 bg-white/10 rounded"></div></td>
+                    <td className="px-6 py-5"><div className="w-20 h-6 bg-white/10 rounded-full"></div></td>
+                    <td className="px-6 py-5"><div className="w-24 h-4 bg-white/10 rounded"></div></td>
                     <td className="px-6 py-5"></td>
                   </tr>
                 ))
@@ -160,38 +160,38 @@ export default function UserManagement() {
                 filteredUsers.map((user, index) => (
                   <tr 
                     key={user.id} 
-                    className={`group transition-colors ${selectedUsers.includes(user.id) ? 'bg-indigo-50/30' : 'hover:bg-[#FAFBFC]'} ${index % 2 === 0 ? '' : 'bg-[#FCFCFD]'}`}
+                    className={`group transition-colors ${selectedUsers.includes(user.id) ? 'bg-indigo-500/20' : 'hover:bg-white/5'}`}
                   >
                     <td className="px-6 py-4">
                       <input 
                         type="checkbox"
                         checked={selectedUsers.includes(user.id)}
                         onChange={() => handleSelectUser(user.id)}
-                        className="w-4 h-4 rounded border-slate-300 text-[var(--color-primary)] focus:ring-[var(--color-primary)]"
+                        className="w-4 h-4 rounded border-slate-700 bg-slate-800 text-[var(--color-primary-light)] focus:ring-[var(--color-primary-light)]"
                       />
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-100 to-blue-100 text-indigo-700 flex items-center justify-center font-bold shadow-sm">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-indigo-700 text-white flex items-center justify-center font-bold shadow-sm">
                           {user.name.charAt(0).toUpperCase()}
                         </div>
-                        <div className="font-bold text-slate-900 group-hover:text-[var(--color-primary)] transition-colors">
+                        <div className="font-bold text-white group-hover:text-[var(--color-primary-light)] transition-colors">
                           {user.name}
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500 font-medium">{user.email}</td>
+                    <td className="px-6 py-4 text-sm text-slate-400 font-medium">{user.email}</td>
                     <td className="px-6 py-4">
                       <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold border ${
                         user.status 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-100' 
-                          : 'bg-slate-100 text-slate-500 border-slate-200'
+                          ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' 
+                          : 'bg-white/10 text-slate-400 border-white/20'
                       }`}>
-                        <div className={`w-2 h-2 rounded-full ${user.status ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`}></div>
+                        <div className={`w-2 h-2 rounded-full ${user.status ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`}></div>
                         {user.status ? 'Active' : 'Inactive'}
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-500 font-medium">
+                    <td className="px-6 py-4 text-sm text-slate-400 font-medium">
                       {new Date(user.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -199,7 +199,7 @@ export default function UserManagement() {
                       <button 
                         onClick={() => handleToggleStatus(user.id)}
                         className={`p-2 rounded-lg transition-colors ${
-                          user.status ? 'text-slate-400 hover:text-red-600 hover:bg-red-50' : 'text-slate-400 hover:text-emerald-600 hover:bg-emerald-50'
+                          user.status ? 'text-slate-400 hover:text-red-400 hover:bg-red-500/20' : 'text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/20'
                         }`}
                         title={user.status ? "Deactivate User" : "Activate User"}
                       >
@@ -210,11 +210,11 @@ export default function UserManagement() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-slate-500">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-slate-50 mb-3">
-                      <User className="w-6 h-6 text-slate-300" />
+                  <td colSpan="6" className="px-6 py-12 text-center text-slate-400">
+                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white/5 mb-3">
+                      <User className="w-6 h-6 text-slate-500" />
                     </div>
-                    <p className="font-medium text-slate-900">No students found</p>
+                    <p className="font-medium text-white">No students found</p>
                     <p className="text-sm mt-1">Adjust your search or filters.</p>
                   </td>
                 </tr>
@@ -224,11 +224,11 @@ export default function UserManagement() {
         </div>
         
         {/* Pagination placeholder */}
-        <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex items-center justify-between text-sm">
-          <span className="text-slate-500 font-medium">Showing {filteredUsers.length} results</span>
+        <div className="px-6 py-4 border-t border-white/10 bg-white/5 flex items-center justify-between text-sm">
+          <span className="text-slate-400 font-medium">Showing {filteredUsers.length} results</span>
           <div className="flex gap-2">
-            <button disabled className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-400 bg-white opacity-50 font-medium">Previous</button>
-            <button disabled className="px-3 py-1.5 border border-slate-200 rounded-lg text-slate-400 bg-white opacity-50 font-medium">Next</button>
+            <button disabled className="px-3 py-1.5 border border-white/10 rounded-lg text-slate-500 bg-transparent opacity-50 font-medium">Previous</button>
+            <button disabled className="px-3 py-1.5 border border-white/10 rounded-lg text-slate-500 bg-transparent opacity-50 font-medium">Next</button>
           </div>
         </div>
       </div>
@@ -240,13 +240,13 @@ export default function UserManagement() {
             initial={{ y: 100, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 100, opacity: 0 }}
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.2)] flex items-center gap-6 z-50 border border-slate-800"
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-glow flex items-center gap-6 z-50 border border-slate-700"
           >
             <span className="font-bold text-sm bg-slate-800 px-3 py-1 rounded-lg">
               {selectedUsers.length} selected
             </span>
             <div className="flex gap-2">
-              <button className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white font-bold text-sm rounded-xl transition-colors">
+              <button className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/50 font-bold text-sm rounded-xl transition-colors">
                 Deactivate Selected
               </button>
               <button onClick={() => setSelectedUsers([])} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm rounded-xl transition-colors">
