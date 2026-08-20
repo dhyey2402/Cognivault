@@ -177,8 +177,8 @@ export default function ActiveQuiz() {
 
   if (isLoading || !questions.length) {
     return (
-      <div className="flex justify-center items-center h-screen bg-slate-50">
-        <div className="w-12 h-12 border-4 border-[var(--color-primary-light)] border-t-[var(--color-primary-dark)] rounded-full animate-spin"></div>
+      <div className="flex justify-center items-center h-screen bg-transparent">
+        <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -201,10 +201,10 @@ export default function ActiveQuiz() {
       currentQuestionId={currentQuestion?.id}
       onEventsFlushed={(count) => setPendingIntegrityEvents(0)}
     >
-      <div className="min-h-screen bg-slate-50 flex flex-col relative overflow-hidden font-sans w-full">
+      <div className="min-h-screen bg-transparent flex flex-col relative overflow-hidden font-sans w-full">
       
       {/* Top Progress Bar */}
-      <div className="w-full h-1 bg-slate-200 fixed top-0 left-0 z-50">
+      <div className="w-full h-1 bg-white/10 fixed top-0 left-0 z-50">
         <div 
           className="h-full bg-gradient-to-r from-[var(--color-primary)] via-[#6366F1] to-[var(--color-secondary)] transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
           style={{ width: `${progressPercentage}%` }}
@@ -224,7 +224,7 @@ export default function ActiveQuiz() {
             </div>
           </div>
 
-          <div className="bg-white rounded-3xl shadow-card border border-slate-100 flex-1 flex flex-col relative overflow-hidden">
+          <div className="glass-panel rounded-3xl border border-white/10 flex-1 flex flex-col relative overflow-hidden">
             {/* Crossfade container */}
             <AnimatePresence mode="wait">
               <motion.div
@@ -237,15 +237,15 @@ export default function ActiveQuiz() {
               >
                 {/* Question Header */}
                 <div className="flex justify-between items-start gap-4 mb-8">
-                  <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-relaxed">
+                  <h2 className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
                     {quiz?.is_story_mode ? 'Mission Objective' : currentQuestion.text}
                   </h2>
                   <button
                     onClick={() => toggleBookmark(currentQuestion.id)}
                     className={`flex-shrink-0 p-3 rounded-full transition-all duration-200 ${
                       bookmarked[currentQuestion.id] 
-                        ? 'bg-amber-100 text-amber-500' 
-                        : 'bg-slate-100 text-slate-400 hover:bg-slate-200 hover:text-slate-600'
+                        ? 'bg-amber-500/20 text-amber-400' 
+                        : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
                     }`}
                   >
                     <Bookmark className="w-6 h-6" fill={bookmarked[currentQuestion.id] ? "currentColor" : "none"} />
@@ -270,16 +270,14 @@ export default function ActiveQuiz() {
                         key={option.id}
                         onClick={() => handleSelectOption(currentQuestion.id, option.id)}
                         className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 flex items-center gap-4 group relative overflow-hidden ${
-                          isSelected 
-                            ? 'border-[var(--color-primary)] bg-indigo-50/40' 
-                            : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                            ? 'border-indigo-500 bg-indigo-500/10' 
+                            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                         } focus:outline-none focus:ring-4 focus:ring-indigo-500/20 active:scale-[0.99]`}
                       >
                         {/* Option Letter Badge */}
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold transition-all duration-300 flex-shrink-0 relative ${
-                          isSelected 
-                            ? 'bg-[var(--color-primary)] text-white shadow-md' 
-                            : 'bg-slate-100 text-slate-500 group-hover:bg-slate-200'
+                            ? 'bg-indigo-500 text-white shadow-md' 
+                            : 'bg-white/10 text-slate-400 group-hover:bg-white/20 group-hover:text-white'
                         }`}>
                           <AnimatePresence>
                             {isSelected ? (
@@ -292,7 +290,7 @@ export default function ActiveQuiz() {
                           </AnimatePresence>
                         </div>
                         
-                        <span className={`text-base sm:text-lg font-medium transition-colors ${isSelected ? 'text-[var(--color-primary-dark)]' : 'text-slate-700'}`}>
+                        <span className={`text-base sm:text-lg font-medium transition-colors ${isSelected ? 'text-indigo-400' : 'text-slate-300 group-hover:text-white'}`}>
                           {option.text}
                         </span>
                       </button>
@@ -303,23 +301,23 @@ export default function ActiveQuiz() {
             </AnimatePresence>
 
             {/* Navigation Footer */}
-            <div className="p-6 border-t border-slate-100 flex items-center justify-between bg-white z-10">
+            <div className="p-6 border-t border-white/10 flex items-center justify-between bg-white/5 z-10 backdrop-blur-md">
               <button
                 onClick={handlePrevious}
                 disabled={currentIndex === 0}
-                className="px-5 py-3 flex items-center gap-2 text-slate-500 font-bold rounded-xl border border-slate-200 hover:bg-slate-50 transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
+                className="px-5 py-3 flex items-center gap-2 text-slate-400 font-bold rounded-xl border border-white/10 hover:bg-white/10 hover:text-white transition-colors disabled:opacity-30 disabled:hover:bg-transparent"
               >
                 <ChevronLeft className="w-5 h-5" /> Previous
               </button>
               
               <div className="hidden sm:block text-xs font-medium text-slate-400">
-                Keyboard: <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">←</kbd> <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-500">→</kbd>
+                Keyboard: <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-slate-400">←</kbd> <kbd className="px-1.5 py-0.5 bg-white/10 rounded text-slate-400">→</kbd>
               </div>
 
               <button
                 onClick={handleNext}
                 disabled={currentIndex === questions.length - 1}
-                className="px-6 py-3 flex items-center gap-2 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-30 shadow-sm"
+                className="px-6 py-3 flex items-center gap-2 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-500 transition-colors disabled:opacity-30 shadow-sm"
               >
                 {quiz?.is_story_mode && answers[currentQuestion.id] ? 'Proceed' : 'Next'} <ChevronRight className="w-5 h-5" />
               </button>
@@ -330,30 +328,30 @@ export default function ActiveQuiz() {
         {/* Right: Sidebar Palette (30%) */}
         <div className="w-full lg:w-80 flex flex-col gap-6">
           {/* Timer Card */}
-          <div className={`bg-white rounded-3xl p-6 shadow-card border border-slate-100 flex items-center justify-center gap-4 transition-colors duration-500 ${
-            isTimeCritical ? 'bg-red-50 border-red-200 animate-pulse-glow shadow-[0_0_20px_rgba(239,68,68,0.2)]' : 
-            isTimeWarning ? 'bg-amber-50 border-amber-200' : ''
+          <div className={`glass-panel rounded-3xl p-6 border border-white/10 flex items-center justify-center gap-4 transition-colors duration-500 ${
+            isTimeCritical ? 'bg-red-500/10 border-red-500/50 animate-pulse-glow shadow-[0_0_20px_rgba(239,68,68,0.2)]' : 
+            isTimeWarning ? 'bg-amber-500/10 border-amber-500/50' : ''
           }`}>
             <motion.div 
               animate={{ rotate: 360 }} 
               transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-              className={`w-12 h-12 rounded-full flex items-center justify-center bg-white shadow-sm ${
+              className={`w-12 h-12 rounded-full flex items-center justify-center bg-white/10 shadow-sm ${
                 isTimeCritical ? 'text-red-500' : isTimeWarning ? 'text-amber-500' : 'text-slate-400'
               }`}
             >
               <Hourglass className="w-6 h-6" />
             </motion.div>
             <div className={`font-mono text-4xl font-black tracking-tight ${
-              isTimeCritical ? 'text-red-600' : isTimeWarning ? 'text-amber-600' : 'text-slate-900'
+              isTimeCritical ? 'text-red-400' : isTimeWarning ? 'text-amber-400' : 'text-white'
             }`}>
               {formatTime(timeLeft)}
             </div>
           </div>
 
           {/* Palette Card */}
-          <div className="bg-white rounded-3xl p-6 shadow-card border border-slate-100 flex-1 flex flex-col">
-            <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-indigo-50 text-[var(--color-primary)] flex items-center justify-center">
+          <div className="glass-panel rounded-3xl p-6 border border-white/10 flex-1 flex flex-col">
+            <h3 className="font-bold text-white mb-4 flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
                 <Target className="w-4 h-4" />
               </div>
               Question Palette
@@ -370,18 +368,18 @@ export default function ActiveQuiz() {
                     key={q.id}
                     onClick={() => setCurrentIndex(idx)}
                     className={`relative w-full aspect-square rounded-xl flex items-center justify-center text-sm font-bold transition-all duration-200 focus:outline-none
-                      ${isCurrent ? 'ring-2 ring-offset-2 ring-[var(--color-primary)]' : ''}
+                      ${isCurrent ? 'ring-2 ring-offset-2 ring-offset-slate-900 ring-indigo-500' : ''}
                       ${isAnswered 
-                        ? 'bg-gradient-to-br from-[var(--color-primary-dark)] to-[var(--color-primary)] text-white shadow-inner' 
+                        ? 'bg-indigo-600 text-white shadow-[0_0_10px_rgba(79,70,229,0.3)]' 
                         : isBookmarked
-                          ? 'bg-amber-50 border-2 border-amber-300 text-amber-700'
-                          : 'bg-white border-2 border-slate-200 text-slate-500 hover:border-slate-300'
+                          ? 'bg-amber-500/20 border-2 border-amber-500/50 text-amber-400'
+                          : 'bg-white/5 border-2 border-white/10 text-slate-400 hover:border-white/30 hover:text-white'
                       }
                     `}
                   >
                     {idx + 1}
                     {isBookmarked && (
-                      <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white ${isAnswered ? 'bg-amber-400' : 'bg-amber-500'}`}></div>
+                      <div className={`absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-slate-900 ${isAnswered ? 'bg-amber-400' : 'bg-amber-500'}`}></div>
                     )}
                   </button>
                 );
@@ -389,10 +387,10 @@ export default function ActiveQuiz() {
             </div>
 
             {/* Legend */}
-            <div className="mt-auto pt-4 border-t border-slate-100 grid grid-cols-2 gap-3 text-xs font-medium text-slate-500">
-              <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-md bg-[var(--color-primary)]"></div> Answered</div>
-              <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-md border-2 border-slate-200"></div> Unanswered</div>
-              <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-md border-2 border-amber-300 bg-amber-50"></div> Bookmarked</div>
+            <div className="mt-auto pt-4 border-t border-white/10 grid grid-cols-2 gap-3 text-xs font-medium text-slate-400">
+              <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-md bg-indigo-500"></div> Answered</div>
+              <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-md border-2 border-white/20"></div> Unanswered</div>
+              <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-md border-2 border-amber-500/50 bg-amber-500/20"></div> Bookmarked</div>
             </div>
 
             {/* Submit Button */}
@@ -421,20 +419,20 @@ export default function ActiveQuiz() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", bounce: 0.3 }}
-              className="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden"
+              className="glass-panel-strong rounded-3xl p-8 max-w-md w-full relative overflow-hidden"
             >
               <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-400 to-amber-500"></div>
               
-              <div className="w-16 h-16 bg-amber-100 text-amber-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+              <div className="w-16 h-16 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center mb-6 mx-auto">
                 <AlertTriangle className="w-8 h-8" />
               </div>
               
-              <h2 className="text-2xl font-extrabold text-slate-900 text-center mb-2">Submit Assessment?</h2>
+              <h2 className="text-2xl font-extrabold text-white text-center mb-2">Submit Assessment?</h2>
               
-              <div className="bg-slate-50 rounded-xl p-4 mb-6 text-center text-slate-600 text-sm">
-                You have answered <span className="font-bold text-slate-900">{answeredCount}</span> out of <span className="font-bold text-slate-900">{questions.length}</span> questions.
+              <div className="bg-white/5 rounded-xl p-4 mb-6 text-center text-slate-300 text-sm">
+                You have answered <span className="font-bold text-white">{answeredCount}</span> out of <span className="font-bold text-white">{questions.length}</span> questions.
                 {questions.length - answeredCount > 0 && (
-                  <div className="text-red-500 font-bold mt-2">
+                  <div className="text-red-400 font-bold mt-2">
                     {questions.length - answeredCount} questions are unanswered and will be marked as incorrect.
                   </div>
                 )}
@@ -444,7 +442,7 @@ export default function ActiveQuiz() {
                 <button
                   onClick={() => setShowConfirmModal(false)}
                   disabled={isSubmitting}
-                  className="flex-1 py-3.5 px-4 bg-white border-2 border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-colors"
+                  className="flex-1 py-3.5 px-4 bg-white/5 border-2 border-white/10 text-slate-300 font-bold rounded-xl hover:bg-white/10 hover:text-white transition-colors"
                 >
                   Go Back
                 </button>

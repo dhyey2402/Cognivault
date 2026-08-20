@@ -56,8 +56,8 @@ export default function QuizListing() {
       {/* Header & Filters */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Available Quizzes</h1>
-          <p className="text-slate-500">Test your knowledge across various categories.</p>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-2">Available Quizzes</h1>
+          <p className="text-slate-400">Test your knowledge across various categories.</p>
         </div>
 
         <div className="flex w-full md:w-auto items-center gap-3">
@@ -68,10 +68,10 @@ export default function QuizListing() {
               placeholder="Search quizzes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-100 border-none rounded-full focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-white transition-all text-sm font-medium"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-white/10 rounded-full focus:ring-2 focus:ring-[var(--color-primary)] focus:bg-slate-800 transition-all text-sm font-medium text-white placeholder-slate-500"
             />
           </div>
-          <button className="p-2.5 bg-slate-100 text-slate-600 rounded-full hover:bg-slate-200 transition-colors">
+          <button className="p-2.5 glass-panel text-slate-300 rounded-full hover:text-white hover:border-white/20 transition-colors">
             <Filter className="w-5 h-5" />
           </button>
         </div>
@@ -85,8 +85,8 @@ export default function QuizListing() {
             onClick={() => setSelectedCategory(cat.name)}
             className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-bold transition-all active:scale-95 ${
               selectedCategory === cat.name
-                ? 'bg-[var(--color-primary-dark)] text-white shadow-md shadow-indigo-200'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                ? 'bg-indigo-600 text-white shadow-[0_0_15px_rgba(79,70,229,0.4)] border border-indigo-400/50'
+                : 'glass-panel text-slate-300 hover:text-white hover:border-white/20'
             }`}
           >
             {cat.name}
@@ -98,12 +98,12 @@ export default function QuizListing() {
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map(i => (
-            <div key={i} className="bg-white rounded-3xl h-64 shadow-sm border border-slate-100 overflow-hidden relative">
-              <div className="h-16 bg-slate-100 animate-pulse"></div>
+            <div key={i} className="glass-panel rounded-3xl h-64 overflow-hidden relative">
+              <div className="h-16 bg-white/5 animate-pulse"></div>
               <div className="p-6">
-                <div className="w-3/4 h-6 bg-slate-100 rounded-md animate-pulse mb-4"></div>
-                <div className="w-full h-4 bg-slate-50 rounded-md animate-pulse mb-2"></div>
-                <div className="w-5/6 h-4 bg-slate-50 rounded-md animate-pulse"></div>
+                <div className="w-3/4 h-6 bg-white/5 rounded-md animate-pulse mb-4"></div>
+                <div className="w-full h-4 bg-white/5 rounded-md animate-pulse mb-2"></div>
+                <div className="w-5/6 h-4 bg-white/5 rounded-md animate-pulse"></div>
               </div>
             </div>
           ))}
@@ -118,7 +118,7 @@ export default function QuizListing() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
                 key={quiz.id}
-                className="group bg-white rounded-3xl shadow-sm hover:shadow-xl border border-slate-100 overflow-hidden transition-all duration-300 flex flex-col h-full hover:-translate-y-1 relative"
+                className="group glass-panel rounded-3xl hover:border-white/30 overflow-hidden transition-all duration-300 flex flex-col h-full hover:-translate-y-1 relative"
               >
                 {/* Glow behind card on hover */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${theme.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
@@ -135,15 +135,15 @@ export default function QuizListing() {
                 </div>
 
                 <div className="p-6 flex flex-col flex-1 z-10 relative">
-                  <h2 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
+                  <h2 className="text-xl font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors line-clamp-2">
                     {quiz.title}
                   </h2>
-                  <p className="text-slate-500 text-sm line-clamp-3 mb-6 flex-1">
+                  <p className="text-slate-400 text-sm line-clamp-3 mb-6 flex-1">
                     {quiz.description || "No description provided."}
                   </p>
                   
                   {/* Dashed divider */}
-                  <div className="border-t border-dashed border-slate-200 mb-4"></div>
+                  <div className="border-t border-dashed border-white/10 mb-4"></div>
 
                   <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-1.5 text-slate-400 text-xs font-bold">
@@ -164,12 +164,12 @@ export default function QuizListing() {
           })}
         </div>
       ) : (
-        <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-slate-200">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-slate-50 mb-4">
-            <Search className="w-8 h-8 text-slate-300" />
+        <div className="text-center py-20 glass-panel rounded-3xl border border-dashed border-white/20">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
+            <Search className="w-8 h-8 text-slate-400" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900">No quizzes found</h3>
-          <p className="text-slate-500 mt-1 max-w-sm mx-auto">Try adjusting your search or filter to find what you're looking for.</p>
+          <h3 className="text-lg font-bold text-white">No quizzes found</h3>
+          <p className="text-slate-400 mt-1 max-w-sm mx-auto">Try adjusting your search or filter to find what you're looking for.</p>
         </div>
       )}
     </div>

@@ -56,8 +56,8 @@ export default function Leaderboard() {
     switch (rank) {
       case 1: return 'bg-yellow-50 border-yellow-200 text-yellow-700';
       case 2: return 'bg-slate-50 border-slate-200 text-slate-700';
-      case 3: return 'bg-amber-50 border-amber-200 text-amber-700';
-      default: return 'bg-white border-slate-100 text-slate-700 hover:bg-slate-50';
+      case 3: return 'bg-amber-500/20 border-amber-500/50 text-amber-400';
+      default: return 'glass-panel text-slate-300 hover:bg-white/10';
     }
   };
 
@@ -69,20 +69,20 @@ export default function Leaderboard() {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <Trophy className="w-8 h-8 text-indigo-500" />
+          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
+            <Trophy className="w-8 h-8 text-indigo-400" />
             Global Leaderboard
           </h1>
-          <p className="text-slate-500 mt-2 text-lg">Compare your performance with peers and climb the ranks.</p>
+          <p className="text-slate-400 mt-2 text-lg">Compare your performance with peers and climb the ranks.</p>
         </div>
         
         {/* Category Filter */}
-        <div className="flex items-center gap-3 bg-white p-2 rounded-xl border border-slate-200 shadow-sm w-full md:w-auto">
+        <div className="flex items-center gap-3 glass-panel p-2 rounded-xl border border-white/10 shadow-sm w-full md:w-auto">
           <Filter className="w-5 h-5 text-slate-400 ml-2" />
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-transparent border-none text-slate-700 font-medium focus:ring-0 cursor-pointer w-full"
+            className="bg-transparent border-none text-slate-300 font-medium focus:ring-0 cursor-pointer w-full [&>option]:bg-slate-900 [&>option]:text-white"
           >
             <option value="">All Categories</option>
             {categories.map((cat) => (
@@ -101,11 +101,10 @@ export default function Leaderboard() {
         <div className="flex justify-center items-center h-64">
            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
         </div>
-      ) : leaderboard.length === 0 ? (
-        <div className="bg-white border border-slate-200 p-12 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
-          <Trophy className="w-16 h-16 text-slate-200 mb-4" />
-          <h3 className="text-xl font-bold text-slate-700 mb-2">No rankings yet</h3>
-          <p className="text-slate-500 max-w-md">Complete quizzes to get ranked on the leaderboard. The more you play, the higher you climb!</p>
+        <div className="glass-panel border-white/10 p-12 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
+          <Trophy className="w-16 h-16 text-slate-700 mb-4" />
+          <h3 className="text-xl font-bold text-slate-300 mb-2">No rankings yet</h3>
+          <p className="text-slate-400 max-w-md">Complete quizzes to get ranked on the leaderboard. The more you play, the higher you climb!</p>
         </div>
       ) : (
         <div className="space-y-8">
@@ -119,15 +118,15 @@ export default function Leaderboard() {
                   initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
                   className="flex flex-col items-center flex-1 max-w-[200px]"
                 >
-                  <div className="text-slate-700 font-bold mb-2 text-center truncate w-full">{topThree[1].student_name}</div>
-                  <div className="text-sm text-slate-500 mb-3 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">
+                  <div className="text-slate-300 font-bold mb-2 text-center truncate w-full">{topThree[1].student_name}</div>
+                  <div className="text-sm text-slate-400 mb-3 glass-panel px-3 py-1 rounded-full shadow-sm border border-white/10">
                     {topThree[1].average_score}% Avg
                   </div>
-                  <div className="w-full h-32 bg-gradient-to-t from-slate-200 to-slate-100 rounded-t-xl border-t border-x border-slate-300 relative flex justify-center">
-                    <div className="absolute -top-8 bg-white p-2 rounded-full shadow-md border border-slate-200">
+                  <div className="w-full h-32 bg-gradient-to-t from-slate-800 to-slate-900 rounded-t-xl border-t border-x border-slate-700 relative flex justify-center">
+                    <div className="absolute -top-8 glass-panel p-2 rounded-full shadow-md border border-white/20">
                       <Medal className="w-8 h-8 text-slate-400" />
                     </div>
-                    <span className="mt-8 text-4xl font-black text-slate-300">2</span>
+                    <span className="mt-8 text-4xl font-black text-slate-700">2</span>
                   </div>
                 </motion.div>
               )}
@@ -141,15 +140,15 @@ export default function Leaderboard() {
                   <div className="absolute -top-6 text-yellow-500 animate-bounce">
                     <Trophy className="w-6 h-6" />
                   </div>
-                  <div className="text-slate-800 font-extrabold text-lg mb-2 text-center truncate w-full">{topThree[0].student_name}</div>
-                  <div className="text-sm font-bold text-yellow-700 mb-3 bg-yellow-100 px-4 py-1.5 rounded-full shadow-sm border border-yellow-200">
+                  <div className="text-white font-extrabold text-lg mb-2 text-center truncate w-full">{topThree[0].student_name}</div>
+                  <div className="text-sm font-bold text-yellow-400 mb-3 bg-yellow-500/20 px-4 py-1.5 rounded-full shadow-sm border border-yellow-500/50">
                     {topThree[0].average_score}% Avg
                   </div>
-                  <div className="w-full h-44 bg-gradient-to-t from-yellow-200 to-yellow-100 rounded-t-xl border-t-2 border-x border-yellow-400 relative flex justify-center shadow-[0_-10px_20px_-10px_rgba(234,179,8,0.3)]">
-                    <div className="absolute -top-10 bg-white p-3 rounded-full shadow-lg border border-yellow-200">
-                      <Trophy className="w-10 h-10 text-yellow-500" />
+                  <div className="w-full h-44 bg-gradient-to-t from-yellow-900/50 to-yellow-900/10 rounded-t-xl border-t-2 border-x border-yellow-500/50 relative flex justify-center shadow-[0_-10px_20px_-10px_rgba(234,179,8,0.3)]">
+                    <div className="absolute -top-10 bg-slate-950 p-3 rounded-full shadow-[0_0_15px_rgba(234,179,8,0.3)] border border-yellow-500/30">
+                      <Trophy className="w-10 h-10 text-yellow-400" />
                     </div>
-                    <span className="mt-12 text-6xl font-black text-yellow-300">1</span>
+                    <span className="mt-12 text-6xl font-black text-yellow-500/30">1</span>
                   </div>
                 </motion.div>
               )}
@@ -160,15 +159,15 @@ export default function Leaderboard() {
                   initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
                   className="flex flex-col items-center flex-1 max-w-[200px]"
                 >
-                  <div className="text-slate-700 font-bold mb-2 text-center truncate w-full">{topThree[2].student_name}</div>
-                  <div className="text-sm text-slate-500 mb-3 bg-white px-3 py-1 rounded-full shadow-sm border border-slate-100">
+                  <div className="text-slate-300 font-bold mb-2 text-center truncate w-full">{topThree[2].student_name}</div>
+                  <div className="text-sm text-slate-400 mb-3 glass-panel px-3 py-1 rounded-full shadow-sm border border-white/10">
                     {topThree[2].average_score}% Avg
                   </div>
-                  <div className="w-full h-24 bg-gradient-to-t from-amber-200 to-amber-100 rounded-t-xl border-t border-x border-amber-300 relative flex justify-center">
-                    <div className="absolute -top-7 bg-white p-2 rounded-full shadow-md border border-amber-200">
-                      <Award className="w-7 h-7 text-amber-600" />
+                  <div className="w-full h-24 bg-gradient-to-t from-amber-900/40 to-amber-900/10 rounded-t-xl border-t border-x border-amber-700/50 relative flex justify-center">
+                    <div className="absolute -top-7 glass-panel p-2 rounded-full shadow-md border border-white/20">
+                      <Award className="w-7 h-7 text-amber-500" />
                     </div>
-                    <span className="mt-6 text-4xl font-black text-amber-300/60">3</span>
+                    <span className="mt-6 text-4xl font-black text-amber-700/50">3</span>
                   </div>
                 </motion.div>
               )}
@@ -176,24 +175,24 @@ export default function Leaderboard() {
           )}
 
           {/* List for the rest */}
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-            <div className="grid grid-cols-12 gap-4 p-4 bg-slate-50 border-b border-slate-200 text-sm font-bold text-slate-500 uppercase tracking-wider">
+          <div className="glass-panel rounded-2xl shadow-sm border border-white/10 overflow-hidden">
+            <div className="grid grid-cols-12 gap-4 p-4 bg-white/5 border-b border-white/10 text-sm font-bold text-slate-400 uppercase tracking-wider">
               <div className="col-span-2 md:col-span-1 text-center">Rank</div>
               <div className="col-span-6 md:col-span-7">Student</div>
               <div className="col-span-4 text-right pr-4">Score</div>
             </div>
             
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-white/5">
               {leaderboard.map((entry) => (
                 <div 
                   key={entry.user_id} 
                   className={`grid grid-cols-12 gap-4 p-4 items-center transition-colors border-l-4 ${
-                    entry.user_id === user.id ? 'border-l-indigo-500 bg-indigo-50/50' : 'border-l-transparent hover:bg-slate-50'
+                    entry.user_id === user.id ? 'border-l-indigo-500 bg-indigo-500/10' : 'border-l-transparent hover:bg-white/5'
                   }`}
                 >
                   <div className="col-span-2 md:col-span-1 flex justify-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                      entry.rank <= 3 ? 'bg-slate-100' : 'text-slate-500'
+                      entry.rank <= 3 ? 'bg-white/10' : 'text-slate-400'
                     }`}>
                       {getRankIcon(entry.rank)}
                     </div>
@@ -201,23 +200,23 @@ export default function Leaderboard() {
                   
                   <div className="col-span-6 md:col-span-7 flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                      entry.user_id === user.id ? 'bg-indigo-100 text-indigo-700' : 'bg-slate-100 text-slate-600'
+                      entry.user_id === user.id ? 'bg-indigo-500/20 text-indigo-400' : 'bg-white/5 text-slate-400'
                     }`}>
                       <User className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="font-bold text-slate-900 flex items-center gap-2">
+                      <div className="font-bold text-white flex items-center gap-2">
                         {entry.student_name}
                         {entry.user_id === user.id && (
-                          <span className="text-[10px] bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded-full uppercase tracking-wider">You</span>
+                          <span className="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-full uppercase tracking-wider">You</span>
                         )}
                       </div>
-                      <div className="text-xs text-slate-500">{entry.quizzes_completed} Quizzes Completed</div>
+                      <div className="text-xs text-slate-400">{entry.quizzes_completed} Quizzes Completed</div>
                     </div>
                   </div>
                   
                   <div className="col-span-4 text-right pr-4">
-                    <div className="font-black text-lg text-slate-800">{entry.average_score}%</div>
+                    <div className="font-black text-lg text-white">{entry.average_score}%</div>
                     <div className="text-xs text-slate-400">Avg Score</div>
                   </div>
                 </div>

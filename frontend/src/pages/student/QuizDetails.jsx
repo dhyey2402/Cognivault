@@ -57,7 +57,7 @@ export default function QuizDetails() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-fade-in pb-12">
-      <Link to="/quizzes" className="inline-flex items-center text-sm font-bold text-slate-500 hover:text-[var(--color-primary)] transition-colors group">
+      <Link to="/quizzes" className="inline-flex items-center text-sm font-bold text-slate-400 hover:text-indigo-400 transition-colors group">
         <ArrowLeft className="w-4 h-4 mr-1.5 group-hover:-translate-x-1 transition-transform" /> Back to Quizzes
       </Link>
 
@@ -94,12 +94,12 @@ export default function QuizDetails() {
           <motion.div 
             initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.1 }}
             key={i} 
-            className="bg-white rounded-2xl p-5 shadow-card border border-slate-100 flex flex-col items-center text-center hover:-translate-y-1 hover:shadow-md transition-all"
+            className="glass-panel rounded-2xl p-5 border border-white/10 flex flex-col items-center text-center hover:-translate-y-1 hover:border-white/20 transition-all"
           >
-            <div className={`w-10 h-10 rounded-full ${stat.bg} ${stat.color} flex items-center justify-center mb-3`}>
+            <div className={`w-10 h-10 rounded-full ${stat.bg.replace('100', '900/40')} ${stat.color.replace('600', '400')} flex items-center justify-center mb-3`}>
               <stat.icon className="w-5 h-5" />
             </div>
-            <span className="text-2xl font-extrabold text-slate-900">{stat.value}</span>
+            <span className="text-2xl font-extrabold text-white">{stat.value}</span>
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider mt-1">{stat.label}</span>
           </motion.div>
         ))}
@@ -108,9 +108,9 @@ export default function QuizDetails() {
       {/* Instructions */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}
-        className="bg-amber-50 rounded-2xl p-6 border-l-4 border-amber-500"
+        className="glass-panel bg-amber-900/10 rounded-2xl p-6 border-l-4 border-l-amber-500 border-white/10"
       >
-        <h3 className="text-lg font-bold text-amber-900 mb-4 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-amber-400 mb-4 flex items-center gap-2">
           <AlertCircle className="w-5 h-5" /> Instructions
         </h3>
         <ul className="space-y-3">
@@ -120,7 +120,7 @@ export default function QuizDetails() {
             'You can navigate freely between questions during the attempt.',
             'The quiz will auto-submit when the timer expires.'
           ].map((text, i) => (
-            <li key={i} className="flex items-start text-amber-800">
+            <li key={i} className="flex items-start text-amber-100/70">
               <span className="mr-2 text-amber-500 mt-0.5">✦</span>
               {text}
             </li>
@@ -150,9 +150,9 @@ export default function QuizDetails() {
             )}
           </button>
         ) : (
-          <div className="w-full bg-slate-100 border-2 border-dashed border-slate-300 rounded-2xl py-6 text-center">
-            <p className="text-red-500 font-bold">This quiz has no questions yet.</p>
-            <p className="text-sm text-slate-500 mt-1">Please check back later when the instructor has added content.</p>
+          <div className="w-full glass-panel border border-dashed border-white/20 rounded-2xl py-6 text-center">
+            <p className="text-red-400 font-bold">This quiz has no questions yet.</p>
+            <p className="text-sm text-slate-400 mt-1">Please check back later when the instructor has added content.</p>
           </div>
         )}
       </motion.div>
