@@ -80,8 +80,8 @@ def login_access_token(
         key="refresh_token",
         value=refresh_token,
         httponly=True,
-        secure=False, # Set to True in production (HTTPS)
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=int(refresh_expires_delta.total_seconds())
     )
     
@@ -130,5 +130,5 @@ def logout(response: Response):
     """
     Logout by clearing the refresh token cookie.
     """
-    response.delete_cookie("refresh_token")
+    response.delete_cookie("refresh_token", secure=True, samesite="none", httponly=True)
     return {"message": "Successfully logged out"}
