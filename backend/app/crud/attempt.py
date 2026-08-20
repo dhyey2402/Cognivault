@@ -103,8 +103,11 @@ def submit_attempt(db: Session, attempt_id: int, answers_in: list[AnswerCreate],
 def get_user_attempts(db: Session, user_id: int):
     return db.query(Attempt).filter(Attempt.user_id == user_id).order_by(Attempt.started_at.desc()).all()
 
-def get_attempt_detail(db: Session, attempt_id: int, user_id: int):
-    return db.query(Attempt).filter(Attempt.id == attempt_id, Attempt.user_id == user_id).first()
+def get_attempt_detail(db: Session, attempt_id: int, user_id: int = None):
+    query = db.query(Attempt).filter(Attempt.id == attempt_id)
+    if user_id is not None:
+        query = query.filter(Attempt.user_id == user_id)
+    return query.first()
 
 def get_student_analytics(db: Session, user_id: int):
     attempts = db.query(Attempt).filter(Attempt.user_id == user_id).order_by(Attempt.started_at.desc()).all()
@@ -306,8 +309,11 @@ def log_integrity_events(db: Session, attempt_id: int, user_id: int, events: lis
     
     return db_events
 
-def get_attempt_integrity_events(db: Session, attempt_id: int, user_id: int):
-    attempt = db.query(Attempt).filter(Attempt.id == attempt_id, Attempt.user_id == user_id).first()
+def get_attempt_integrity_events(db: Session, attempt_id: int, user_id: int = None):
+    query = db.query(Attempt).filter(Attempt.id == attempt_id)
+    if user_id is not None:
+        query = query.filter(Attempt.user_id == user_id)
+    attempt = query.first()
     if not attempt:
         return None
     return db.query(ExamIntegrityEvent).filter(ExamIntegrityEvent.attempt_id == attempt.id).order_by(ExamIntegrityEvent.occurred_at.asc()).all()

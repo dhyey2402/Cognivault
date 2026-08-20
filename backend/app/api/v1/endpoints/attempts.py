@@ -59,7 +59,10 @@ def get_integrity_events(
 ):
     # This might be used by admins, but allowing the student to fetch their own events for now, or just restricting to admin in a separate endpoint
     # Since it's for student's attempt, we use get_attempt_integrity_events which validates user_id
-    events = crud_attempt.get_attempt_integrity_events(db, attempt_id=attempt_id, user_id=current_user.id)
+    if current_user.role == "ADMIN":
+        events = crud_attempt.get_attempt_integrity_events(db, attempt_id=attempt_id, user_id=None)
+    else:
+        events = crud_attempt.get_attempt_integrity_events(db, attempt_id=attempt_id, user_id=current_user.id)
     if events is None:
         raise HTTPException(status_code=404, detail="Attempt not found")
     return events
@@ -85,7 +88,10 @@ def read_attempt_detail(
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_active_user)
 ):
-    attempt = crud_attempt.get_attempt_detail(db, attempt_id=attempt_id, user_id=current_user.id)
+    if current_user.role == "ADMIN":
+        attempt = crud_attempt.get_attempt_detail(db, attempt_id=attempt_id, user_id=None)
+    else:
+        attempt = crud_attempt.get_attempt_detail(db, attempt_id=attempt_id, user_id=current_user.id)
     if not attempt:
         raise HTTPException(status_code=404, detail="Attempt not found")
     return attempt
