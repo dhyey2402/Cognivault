@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from typing import List, Optional
 from app.api import deps
-from app.models.user import User
+from app.models.user import User, RoleEnum
 from app.models.quiz import Quiz, Attempt, AttemptStatus
 from app.schemas.leaderboard import LeaderboardEntry
 
@@ -27,7 +27,7 @@ def get_leaderboard(
     # Filter out in-progress attempts
     query = query.filter(Attempt.status != AttemptStatus.IN_PROGRESS)
     # Only include active students
-    query = query.filter(User.role == "STUDENT", User.status == True)
+    query = query.filter(User.role == RoleEnum.STUDENT, User.status == True)
 
     if category_id:
         query = query.join(Quiz, Attempt.quiz_id == Quiz.id)

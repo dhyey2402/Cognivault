@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, case
 from app.api import deps
-from app.models.user import User
+from app.models.user import User, RoleEnum
 from app.models.quiz import Quiz, Attempt, Question, Category, QuizStatus, AttemptStatus
 from datetime import datetime, timedelta
 
@@ -17,10 +17,10 @@ def get_dashboard_analytics(
     thirty_days_ago = now - timedelta(days=30)
 
     # Student stats
-    total_students = db.query(User).filter(User.role == "STUDENT").count()
-    active_students = db.query(User).filter(User.role == "STUDENT", User.status == True).count()
+    total_students = db.query(User).filter(User.role == RoleEnum.STUDENT).count()
+    active_students = db.query(User).filter(User.role == RoleEnum.STUDENT, User.status == True).count()
     inactive_students = total_students - active_students
-    new_students = db.query(User).filter(User.role == "STUDENT", User.created_at >= thirty_days_ago).count()
+    new_students = db.query(User).filter(User.role == RoleEnum.STUDENT, User.created_at >= thirty_days_ago).count()
 
     # Quiz stats
     total_quizzes = db.query(Quiz).count()
@@ -119,7 +119,7 @@ def get_dashboard_analytics(
         User.name,
         func.count(Attempt.id).label('attempts'),
         func.avg(Attempt.percentage).label('avg_score')
-    ).join(Attempt).filter(User.role == "STUDENT").group_by(User.id).order_by(desc('avg_score'), desc('attempts')).limit(5).all()
+    ).join(Attempt).filter(User.role == RoleEnum.STUDENT).group_by(User.id).order_by(desc('avg_score'), desc('attempts')).limit(5).all()
     
     top_performers = [
         {"name": p.name, "attempts": p.attempts, "average_score": round(p.avg_score, 2) if p.avg_score else 0}
@@ -191,7 +191,7 @@ def get_all_users(
     db: Session = Depends(deps.get_db),
     current_user: User = Depends(deps.get_current_admin)
 ):
-    users = db.query(User).filter(User.role == "STUDENT").all()
+    users = db.query(User).filter(User.role == RoleEnum.STUDENT).all()
     return [{"id": u.id, "name": u.name, "email": u.email, "status": u.status, "created_at": u.created_at} for u in users]
 
 @router.put("/users/{user_id}/toggle-status")
