@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import api, { setAccessToken, getAccessToken } from '../lib/api';
+import api, { setAccessToken, getAccessToken, getBaseUrl } from '../lib/api';
 import axios from 'axios'; // We might need this for raw refresh calls if needed, but api works
 
 const AuthContext = createContext();
@@ -12,9 +12,7 @@ export function AuthProvider({ children }) {
     const initAuth = async () => {
       try {
         // Try to refresh token on initial load
-        const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-        const cleanBaseUrl = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-        const refreshUrl = `${cleanBaseUrl}/api/v1/auth/refresh`;
+        const refreshUrl = `${getBaseUrl()}/api/v1/auth/refresh`;
         const response = await axios.post(refreshUrl, {}, {
           withCredentials: true
         });

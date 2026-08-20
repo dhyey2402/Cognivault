@@ -1,7 +1,10 @@
 import axios from 'axios';
 
-const getBaseUrl = () => {
-  const url = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const getBaseUrl = () => {
+  let url = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+  if (url.includes('onrender.com') && url.startsWith('http://')) {
+    url = url.replace('http://', 'https://');
+  }
   return url.endsWith('/') ? url.slice(0, -1) : url;
 };
 

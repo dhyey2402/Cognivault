@@ -5,6 +5,16 @@ from app.schemas.attempt import AttemptCreate, AnswerCreate, ExamIntegrityEventC
 import datetime
 
 def start_attempt(db: Session, user_id: int, attempt_in: AttemptCreate):
+    # Idempotency check: if user already has an IN_PROGRESS attempt for this quiz, return it
+    existing_attempt = db.query(Attempt).filter(
+        Attempt.user_id == user_id, 
+        Attempt.quiz_id == attempt_in.quiz_id,
+        Attempt.status == AttemptStatus.IN_PROGRESS
+    ).first()
+    
+    if existing_attempt:
+        return existing_attempt
+
     db_attempt = Attempt(
         user_id=user_id,
         quiz_id=attempt_in.quiz_id,
@@ -21,9 +31,13 @@ def submit_attempt(db: Session, attempt_id: int, answers_in: list[AnswerCreate],
         return None
 
     # Calculate real time taken based on server timestamps
-    now = datetime.datetime.utcnow()
-    # Ensure attempt.started_at is timezone-naive if now is timezone-naive
-    time_elapsed = int((now - attempt.started_at).total_seconds())
+    now = datetime.datetime.now(datetime.timezone.utc)
+    # Ensure attempt.started_at is timezone-aware
+    started = attempt.started_at
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=datetime.timezone.utc)
+        
+    time_elapsed = int((now - started).total_seconds())
 
     # Allow a small grace period for network latency (e.g., 60 seconds)
     duration_minutes = attempt.quiz.duration if attempt.quiz.duration else 120 # Default to 120 if None
@@ -80,7 +94,7 @@ def submit_attempt(db: Session, attempt_id: int, answers_in: list[AnswerCreate],
     attempt.unanswered = unanswered_count
     attempt.time_taken = real_time_taken
     attempt.status = AttemptStatus.PASSED if passed else AttemptStatus.FAILED
-    attempt.completed_at = datetime.datetime.utcnow()
+    attempt.completed_at = datetime.datetime.now(datetime.timezone.utc)
 
     db.commit()
     db.refresh(attempt)
@@ -133,8 +147,17 @@ def get_student_analytics(db: Session, user_id: int):
 
 def get_focus_dna(db: Session, attempt_id: int, user_id: int):
     attempt = db.query(Attempt).filter(Attempt.id == attempt_id, Attempt.user_id == user_id).first()
-    if not attempt or not attempt.answers:
+    if not attempt:
         return None
+        
+    if not attempt.answers:
+        return {
+            "behavioral_profile": "Insufficient Data",
+            "insights": ["No answers submitted yet to generate a profile."],
+            "average_time_per_question": 0,
+            "total_answer_changes": 0,
+            "data_sufficient": False
+        }
         
     total_time = sum((a.time_spent_seconds or 0) for a in attempt.answers)
     avg_time = total_time / len(attempt.answers) if attempt.answers else 0
