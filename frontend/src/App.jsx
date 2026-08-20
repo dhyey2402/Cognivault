@@ -14,6 +14,7 @@ import QuizManagement from './pages/admin/QuizManagement';
 import QuizBuilder from './pages/admin/QuizBuilder';
 import CategoryManagement from "./pages/admin/CategoryManagement";
 import AttemptReview from './pages/admin/AttemptReview';
+import QuizMonitor from './pages/admin/QuizMonitor';
 import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminSettings from './pages/admin/AdminSettings';
 
@@ -62,6 +63,7 @@ function App() {
                 <Route path="quizzes/:quizId/builder" element={<QuizBuilder />} />
                 <Route path="categories" element={<CategoryManagement />} />
                 <Route path="attempts/:attemptId" element={<AttemptReview />} />
+                <Route path="quizzes/:quizId/monitor" element={<QuizMonitor />} />
                 <Route path="analytics" element={<AdminAnalytics />} />
                 <Route path="settings" element={<AdminSettings />} />
               </Route>

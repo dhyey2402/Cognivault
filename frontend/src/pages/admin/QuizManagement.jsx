@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../services/api';
-import { Plus, Edit2, Trash2, BookOpen, Link as LinkIcon, Search, LayoutGrid, List, Clock, Copy, MoreHorizontal, Globe, Globe2, EyeOff } from 'lucide-react';
+import { Plus, Edit2, Trash2, BookOpen, Link as LinkIcon, Search, LayoutGrid, List, Clock, Copy, MoreHorizontal, Globe, Globe2, EyeOff, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
@@ -22,7 +22,8 @@ export default function QuizManagement() {
     duration_minutes: 30,
     passing_score: 50,
     max_attempts: 1,
-    difficulty: 'MEDIUM'
+    difficulty: 'MEDIUM',
+    is_secure_mode: false
   });
   const [categories, setCategories] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +60,8 @@ export default function QuizManagement() {
         duration: quiz.duration || quiz.duration_minutes || 30,
         passing_score: quiz.passing_score || 50,
         max_attempts: quiz.max_attempts || 1,
-        difficulty: quiz.difficulty || 'MEDIUM'
+        difficulty: quiz.difficulty || 'MEDIUM',
+        is_secure_mode: quiz.is_secure_mode || false
       });
     } else {
       setEditingQuiz(null);
@@ -70,7 +72,8 @@ export default function QuizManagement() {
         duration: 30,
         passing_score: 50,
         max_attempts: 1,
-        difficulty: 'MEDIUM'
+        difficulty: 'MEDIUM',
+        is_secure_mode: false
       });
     }
     setCurrentStep(1);
@@ -267,6 +270,13 @@ export default function QuizManagement() {
                             >
                               <Edit2 className="w-4 h-4" /> <span className="hidden sm:inline">Builder</span>
                             </Link>
+                            <Link
+                              to={`/admin/quizzes/${quiz.id}/monitor`}
+                              className="p-2 text-slate-400 hover:text-cyan-400 hover:bg-cyan-500/20 rounded-lg transition-colors font-medium text-sm flex items-center gap-1"
+                              title="Live Monitor / Submissions"
+                            >
+                              <Activity className="w-4 h-4" />
+                            </Link>
                             <button
                               onClick={() => handleOpenModal(quiz)}
                               className="p-2 text-slate-400 hover:text-slate-300 hover:bg-white/10 rounded-lg transition-colors"
@@ -330,6 +340,9 @@ export default function QuizManagement() {
                         </button>
                         <Link to={`/admin/quizzes/${quiz.id}/builder`} className="p-2 bg-indigo-500/20 text-[var(--color-primary-light)] rounded-lg hover:bg-[var(--color-primary)] hover:text-white transition-colors">
                           <Edit2 className="w-4 h-4" />
+                        </Link>
+                        <Link to={`/admin/quizzes/${quiz.id}/monitor`} className="p-2 bg-cyan-500/20 text-cyan-400 rounded-lg hover:bg-cyan-500 hover:text-white transition-colors" title="Live Monitor / Submissions">
+                          <Activity className="w-4 h-4" />
                         </Link>
                         <button onClick={() => handleDelete(quiz.id)} className="p-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500 hover:text-white transition-colors">
                           <Trash2 className="w-4 h-4" />
@@ -427,6 +440,21 @@ export default function QuizManagement() {
                           <option value="HARD">Hard</option>
                         </select>
                       </div>
+                    </div>
+                    
+                    <div className="pt-4 border-t border-white/10 mt-4">
+                      <label className="flex items-center gap-3 cursor-pointer p-4 rounded-xl border transition-all duration-200 hover:bg-white/5 border-white/10">
+                        <input
+                          type="checkbox"
+                          checked={formData.is_secure_mode}
+                          onChange={(e) => setFormData({ ...formData, is_secure_mode: e.target.checked })}
+                          className="w-5 h-5 rounded border-white/20 bg-slate-900/50 text-[var(--color-primary)] focus:ring-[var(--color-primary)] focus:ring-offset-slate-900"
+                        />
+                        <div>
+                          <p className="text-sm font-bold text-white">Enable Exam Shield (Secure Mode)</p>
+                          <p className="text-xs text-slate-400 mt-1">Activates AI proctoring, tab switching detection, and right-click prevention.</p>
+                        </div>
+                      </label>
                     </div>
                   </motion.div>
                 )}

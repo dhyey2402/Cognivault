@@ -12,6 +12,34 @@ router = APIRouter()
 def read_quizzes(skip: int = 0, limit: int = 100, db: Session = Depends(deps.get_db)):
     return crud_quiz.get_quizzes(db, skip=skip, limit=limit)
 
+@router.get("/{quiz_id}/attempts")
+def get_quiz_attempts(
+    quiz_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: User = Depends(deps.get_current_admin)
+):
+    from app.models.quiz import Attempt
+    from sqlalchemy import desc
+    quiz = crud_quiz.get_quiz(db, quiz_id=quiz_id)
+    if not quiz:
+        raise HTTPException(status_code=404, detail="Quiz not found")
+        
+    attempts = db.query(Attempt).filter(Attempt.quiz_id == quiz_id).order_by(desc(Attempt.started_at)).all()
+    
+    return [
+        {
+            "id": a.id,
+            "user_id": a.user_id,
+            "user_name": a.user.name if a.user else "Unknown User",
+            "score": a.score,
+            "percentage": a.percentage,
+            "time_taken": a.time_taken,
+            "status": a.status.value,
+            "started_at": a.started_at,
+            "completed_at": a.completed_at
+        } for a in attempts
+    ]
+
 @router.post("/", response_model=QuizResponse)
 def create_quiz(
     quiz_in: QuizCreate, 

@@ -57,6 +57,10 @@ export const api = {
     const response = await axiosInstance.get(`/quizzes/join/${code}`);
     return response.data;
   },
+  getQuizAttempts: async (quizId) => {
+    const response = await axiosInstance.get(`/quizzes/${quizId}/attempts`);
+    return response.data;
+  },
   createQuiz: async (data) => {
     const response = await axiosInstance.post('/quizzes/', data);
     return response.data;

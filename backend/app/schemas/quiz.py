@@ -99,6 +99,7 @@ class QuizBase(BaseModel):
     status: QuizStatus = QuizStatus.DRAFT
     join_code: Optional[str] = None
     is_story_mode: bool = False
+    is_secure_mode: bool = False
 
 class QuizCreate(QuizBase):
     pass
@@ -129,3 +130,4 @@ class QuizUpdate(BaseModel):
     max_attempts: Optional[int] = None
     status: Optional[QuizStatus] = None
     is_story_mode: Optional[bool] = None
+    is_secure_mode: Optional[bool] = None
