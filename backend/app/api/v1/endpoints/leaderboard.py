@@ -13,8 +13,7 @@ router = APIRouter()
 def get_leaderboard(
     category_id: Optional[int] = Query(None, description="Filter by category"),
     limit: int = 100,
-    db: Session = Depends(deps.get_db),
-    current_user: User = Depends(deps.get_current_active_user)
+    db: Session = Depends(deps.get_db)
 ):
     # Base query for completed attempts
     query = db.query(
