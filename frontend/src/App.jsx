@@ -14,6 +14,8 @@ import QuizManagement from './pages/admin/QuizManagement';
 import QuizBuilder from './pages/admin/QuizBuilder';
 import CategoryManagement from "./pages/admin/CategoryManagement";
 import AttemptReview from './pages/admin/AttemptReview';
+import AdminAnalytics from './pages/admin/AdminAnalytics';
+import AdminSettings from './pages/admin/AdminSettings';
 
 import StudentLayout from "./components/StudentLayout";
 import JoinQuiz from "./pages/student/JoinQuiz";
@@ -23,6 +25,7 @@ import QuizDetails from './pages/student/QuizDetails';
 import ActiveQuiz from './pages/student/ActiveQuiz';
 import QuizResult from './pages/student/QuizResult';
 import Leaderboard from './pages/student/Leaderboard';
+import StudentSettings from './pages/student/StudentSettings';
 
 function App() {
   return (
@@ -46,6 +49,7 @@ function App() {
                 <Route path="/join/:code" element={<JoinQuiz />} />
                 <Route path="/results/:attemptId" element={<QuizResult />} />
                 <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/settings" element={<StudentSettings />} />
               </Route>
             </Route>
 
@@ -58,8 +62,8 @@ function App() {
                 <Route path="quizzes/:quizId/builder" element={<QuizBuilder />} />
                 <Route path="categories" element={<CategoryManagement />} />
                 <Route path="attempts/:attemptId" element={<AttemptReview />} />
-                <Route path="analytics" element={<div className="p-6 text-slate-500">Analytics module is under construction.</div>} />
-                <Route path="settings" element={<div className="p-6 text-slate-500">Settings module is under construction.</div>} />
+                <Route path="analytics" element={<AdminAnalytics />} />
+                <Route path="settings" element={<AdminSettings />} />
               </Route>
             </Route>
 
