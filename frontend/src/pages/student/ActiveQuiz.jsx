@@ -238,7 +238,7 @@ export default function ActiveQuiz() {
                 {/* Question Header */}
                 <div className="flex justify-between items-start gap-4 mb-8">
                   <h2 className="text-xl sm:text-2xl font-bold text-white leading-relaxed">
-                    {quiz?.is_story_mode ? 'Mission Objective' : currentQuestion.text}
+                    {quiz?.is_story_mode ? 'Mission Objective' : currentQuestion.question_text}
                   </h2>
                   <button
                     onClick={() => toggleBookmark(currentQuestion.id)}
@@ -255,7 +255,7 @@ export default function ActiveQuiz() {
                 {quiz?.is_story_mode && currentQuestion.story_context && (
                   <div className="mb-6 p-5 rounded-2xl bg-indigo-900 text-indigo-50 shadow-inner border border-indigo-700/50">
                     <p className="text-lg leading-relaxed italic">{currentQuestion.story_context}</p>
-                    <p className="mt-4 font-bold text-indigo-200">Question: {currentQuestion.text}</p>
+                    <p className="mt-4 font-bold text-indigo-200">Question: {currentQuestion.question_text}</p>
                   </div>
                 )}
 
@@ -293,7 +293,7 @@ export default function ActiveQuiz() {
                         </div>
                         
                         <span className={`text-base sm:text-lg font-medium transition-colors ${isSelected ? 'text-indigo-400' : 'text-slate-300 group-hover:text-white'}`}>
-                          {option.text}
+                          {option.option_text}
                         </span>
                       </button>
                     );

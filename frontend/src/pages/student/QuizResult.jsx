@@ -265,7 +265,7 @@ export default function QuizResult() {
                 <div className="flex justify-between items-start gap-4 mb-6">
                   <h3 className="text-lg font-bold text-white leading-relaxed">
                     <span className="text-slate-400 mr-2">{index + 1}.</span>
-                    {question.text}
+                    {question.question_text}
                   </h3>
                   <div className={`flex-shrink-0 px-2.5 py-1 rounded-md text-sm font-bold ${
                     isCorrect ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
@@ -296,7 +296,7 @@ export default function QuizResult() {
                     return (
                       <div key={option.id} className={`flex items-center justify-between p-4 rounded-xl border-2 ${optionStyle} transition-all`}>
                         <div className={`text-base font-medium ${isSelected && !isActuallyCorrect ? 'line-through text-slate-500' : 'text-slate-300'}`}>
-                          {option.text}
+                          {option.option_text}
                         </div>
                         {badge && <div>{badge}</div>}
                       </div>
