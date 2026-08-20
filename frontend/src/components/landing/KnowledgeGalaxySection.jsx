@@ -37,10 +37,10 @@ export default function KnowledgeGalaxySection() {
               <div className="w-16 h-16 bg-gradient-to-br from-indigo-400 to-cyan-500 rounded-full shadow-[0_0_30px_rgba(99,102,241,0.6)] z-10"></div>
               
               {/* Constellations */}
-              <svg className="absolute inset-0 w-full h-full" stroke="rgba(52,211,153,0.3)" strokeWidth="1.5" fill="none">
-                <path d="M 50% 50% L 20% 30% L 30% 15%" />
-                <path d="M 50% 50% L 75% 25% L 85% 45%" />
-                <path d="M 50% 50% L 70% 75% L 40% 85%" />
+              <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none" stroke="rgba(52,211,153,0.3)" strokeWidth="1.5" fill="none">
+                <path d="M 50 50 L 20 30 L 30 15" />
+                <path d="M 50 50 L 75 25 L 85 45" />
+                <path d="M 50 50 L 70 75 L 40 85" />
               </svg>
 
               {/* Nodes */}

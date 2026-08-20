@@ -12,7 +12,8 @@ export function AuthProvider({ children }) {
     const initAuth = async () => {
       try {
         // Try to refresh token on initial load
-        const response = await axios.post('http://localhost:8000/api/v1/auth/refresh', {}, {
+        const refreshUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1/auth/refresh` : 'http://localhost:8000/api/v1/auth/refresh';
+        const response = await axios.post(refreshUrl, {}, {
           withCredentials: true
         });
         const newAccessToken = response.data.access_token;

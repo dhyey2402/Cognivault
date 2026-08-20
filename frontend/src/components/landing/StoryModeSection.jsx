@@ -56,7 +56,7 @@ export default function StoryModeSection() {
 
               {/* Decorative side paths */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none" stroke="rgba(249,115,22,0.2)" strokeWidth="2" fill="none">
-                <path d="M 0 50% L 100% 50%" strokeDasharray="4 4" />
+                <line x1="0" y1="50%" x2="100%" y2="50%" strokeDasharray="4 4" />
                 <circle cx="50%" cy="50%" r="150" strokeDasharray="4 4" opacity="0.5" />
               </svg>
             </div>

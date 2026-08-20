@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_URL ? `${import.meta.env.VITE_URL}/api/v1` : 'http://localhost:8000/api/v1',
+  baseURL: import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1` : 'http://localhost:8000/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -61,7 +61,7 @@ api.interceptors.response.use(
       isRefreshing = true;
       
       try {
-        const refreshUrl = import.meta.env.VITE_URL ? `${import.meta.env.VITE_URL}/api/v1/auth/refresh` : 'http://localhost:8000/api/v1/auth/refresh';
+        const refreshUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api/v1/auth/refresh` : 'http://localhost:8000/api/v1/auth/refresh';
         const response = await axios.post(refreshUrl, {}, {
           withCredentials: true
         });
