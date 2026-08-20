@@ -39,11 +39,11 @@ export default function AdminAnalytics() {
     <div className="space-y-8 animate-fade-in pb-12 relative z-10">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-            <BarChartIcon className="w-8 h-8 text-cyan-400" />
+          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight flex items-center gap-3">
+            <BarChartIcon className="w-8 h-8 text-[var(--color-primary)]" />
             Platform Analytics
           </h1>
-          <p className="text-slate-400 mt-2">Deep dive into platform engagement and assessment metrics.</p>
+          <p className="text-slate-500 mt-2">Deep dive into platform engagement and assessment metrics.</p>
         </div>
       </div>
 
@@ -53,23 +53,22 @@ export default function AdminAnalytics() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <LearningEcosystem categories={stats.category_health} />
         
-        {/* Pass/Fail Breakdown Widget */}
-        <div className="glass-panel p-6 rounded-3xl border border-white/10 flex flex-col justify-center items-center relative overflow-hidden">
-           <div className="absolute top-0 right-0 p-4 opacity-10">
-             <TrendingUp className="w-32 h-32" />
+        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col justify-center items-center relative overflow-hidden">
+           <div className="absolute top-0 right-0 p-4 opacity-5">
+             <TrendingUp className="w-32 h-32 text-slate-800" />
            </div>
-           <h3 className="text-xl font-bold text-white mb-6 w-full text-left">Pass vs Fail Ratio</h3>
+           <h3 className="text-xl font-bold text-slate-800 mb-6 w-full text-left">Pass vs Fail Ratio</h3>
            <div className="flex w-full items-center justify-evenly mt-4 relative z-10">
              <div className="text-center">
-                <p className="text-emerald-400 text-5xl font-black">{stats.pass_fail_analytics?.pass_percentage || 0}%</p>
-                <p className="text-slate-400 mt-2 font-medium">Pass Rate</p>
-                <p className="text-slate-500 text-sm">{stats.pass_fail_analytics?.passed || 0} Passed</p>
+                <p className="text-emerald-500 text-5xl font-black">{stats.pass_fail_analytics?.pass_percentage || 0}%</p>
+                <p className="text-slate-500 mt-2 font-medium">Pass Rate</p>
+                <p className="text-slate-400 text-sm">{stats.pass_fail_analytics?.passed || 0} Passed</p>
              </div>
-             <div className="h-24 w-px bg-white/10 mx-4"></div>
+             <div className="h-24 w-px bg-slate-200 mx-4"></div>
              <div className="text-center">
-                <p className="text-rose-400 text-5xl font-black">{stats.pass_fail_analytics?.pass_percentage ? (100 - stats.pass_fail_analytics.pass_percentage).toFixed(2) : 0}%</p>
-                <p className="text-slate-400 mt-2 font-medium">Fail Rate</p>
-                <p className="text-slate-500 text-sm">{stats.pass_fail_analytics?.failed || 0} Failed</p>
+                <p className="text-rose-500 text-5xl font-black">{stats.pass_fail_analytics?.pass_percentage ? (100 - stats.pass_fail_analytics.pass_percentage).toFixed(2) : 0}%</p>
+                <p className="text-slate-500 mt-2 font-medium">Fail Rate</p>
+                <p className="text-slate-400 text-sm">{stats.pass_fail_analytics?.failed || 0} Failed</p>
              </div>
            </div>
         </div>
