@@ -98,8 +98,8 @@ class QuizBase(BaseModel):
     max_attempts: int = 1
     status: QuizStatus = QuizStatus.DRAFT
     join_code: Optional[str] = None
-    is_story_mode: bool = False
-    is_secure_mode: bool = False
+    is_story_mode: Optional[bool] = False
+    is_secure_mode: Optional[bool] = False
 
 class QuizCreate(QuizBase):
     pass
