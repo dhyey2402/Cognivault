@@ -2,6 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.v1.api import api_router
+from app.db.database import Base, engine
+from app.db.migrations_auto import auto_migrate
+
+Base.metadata.create_all(bind=engine)
+auto_migrate()
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

@@ -228,6 +228,12 @@ export default function QuizBuilder() {
               >
                 <ShieldAlert className="w-4 h-4" /> {quiz?.is_secure_mode ? 'ExamShield ON' : 'ExamShield OFF'}
               </button>
+              <Link
+                to={`/admin/quizzes/${quiz?.id}/monitor`}
+                className="px-4 py-2 rounded-lg font-bold text-sm transition-colors border-2 bg-emerald-500/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/30 flex items-center gap-1 ml-2"
+              >
+                <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div> Live Monitor
+              </Link>
             </div>
           </div>
           <div className="flex items-center gap-4 mt-3">
