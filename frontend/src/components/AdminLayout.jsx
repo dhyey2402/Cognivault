@@ -12,6 +12,7 @@ export default function AdminLayout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   
   const isAdminDashboard = location.pathname === '/admin';
+  const isDarkPage = location.pathname === '/admin' || location.pathname === '/admin/analytics' || location.pathname === '/admin/settings';
 
   const handleLogout = () => {
     logout();
@@ -28,16 +29,16 @@ export default function AdminLayout() {
   ];
 
   return (
-    <div className={`flex h-screen overflow-hidden ${isAdminDashboard ? 'text-white' : 'bg-[var(--color-background)]'}`}>
+    <div className={`flex h-screen overflow-hidden ${isDarkPage ? 'text-white bg-slate-950' : 'bg-[var(--color-background)]'}`}>
       
       {/* 3D Background specifically for dashboard */}
-      {isAdminDashboard && <CommandGrid />}
+      {isDarkPage && <CommandGrid />}
 
       {/* Sidebar */}
       <motion.aside 
         animate={{ width: isCollapsed ? 72 : 260 }}
         transition={{ type: "spring", bounce: 0, duration: 0.3 }}
-        className={`${isAdminDashboard ? 'bg-slate-950/80 backdrop-blur-xl border-r border-white/5 text-slate-300' : 'bg-[var(--color-background-dark)] text-slate-300'} hidden md:flex md:flex-col relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.06)]`}
+        className={`${isDarkPage ? 'bg-slate-950/80 backdrop-blur-xl border-r border-white/5 text-slate-300' : 'bg-[var(--color-background-dark)] text-slate-300'} hidden md:flex md:flex-col relative z-20 shadow-[4px_0_24px_rgba(0,0,0,0.06)]`}
       >
         <div className="h-[72px] flex items-center px-5 flex-shrink-0">
           <Link to="/admin" className="flex items-center gap-3 overflow-hidden whitespace-nowrap">
@@ -150,7 +151,7 @@ export default function AdminLayout() {
 
       {/* Mobile Header (Only visible on small screens) */}
       <div className="md:hidden flex flex-col w-full h-full relative z-10">
-        <header className={`${isAdminDashboard ? 'bg-slate-950/80 backdrop-blur-xl border-b border-white/10' : 'bg-[var(--color-background-dark)]'} h-16 flex items-center justify-between px-4 flex-shrink-0`}>
+        <header className={`${isDarkPage ? 'bg-slate-950/80 backdrop-blur-xl border-b border-white/10' : 'bg-[var(--color-background-dark)]'} h-16 flex items-center justify-between px-4 flex-shrink-0`}>
           <div className="flex items-center gap-2">
             <BrainCircuit className="w-6 h-6 text-[var(--color-primary-light)]" />
             <span className="text-lg font-bold text-white tracking-tight">Quizora Admin</span>
@@ -171,13 +172,13 @@ export default function AdminLayout() {
 
       {/* Desktop Main Content */}
       <main className="flex-1 flex flex-col hidden md:flex h-full min-w-0 relative z-10">
-        <header className={`h-16 flex items-center justify-between px-8 flex-shrink-0 sticky top-0 z-10 ${isAdminDashboard ? 'bg-transparent border-b border-white/5' : 'bg-white/80 backdrop-blur-md border-b border-slate-200/60'}`}>
+        <header className={`h-16 flex items-center justify-between px-8 flex-shrink-0 sticky top-0 z-10 ${isDarkPage ? 'bg-transparent border-b border-white/5' : 'bg-white/80 backdrop-blur-md border-b border-slate-200/60'}`}>
            {/* Dynamic Breadcrumbs could go here based on route */}
            <div className={`flex items-center text-sm font-medium ${isAdminDashboard ? 'text-slate-400' : 'text-slate-500'}`}>
-             Admin <span className={`mx-2 ${isAdminDashboard ? 'text-slate-600' : 'text-slate-300'}`}>/</span> <span className={`capitalize ${isAdminDashboard ? 'text-white' : 'text-slate-900'}`}>{location.pathname.split('/').pop() || 'Dashboard'}</span>
+             Admin <span className={`mx-2 ${isDarkPage ? 'text-slate-600' : 'text-slate-300'}`}>/</span> <span className={`capitalize ${isDarkPage ? 'text-white' : 'text-slate-900'}`}>{location.pathname.split('/').pop() || 'Dashboard'}</span>
            </div>
         </header>
-        <div className={`flex-1 p-8 overflow-y-auto overflow-x-hidden custom-scrollbar ${isAdminDashboard ? 'bg-transparent' : 'bg-[var(--color-background)]'}`}>
+        <div className={`flex-1 p-8 overflow-y-auto overflow-x-hidden custom-scrollbar ${isDarkPage ? 'bg-slate-950 text-white' : 'bg-[var(--color-background)]'}`}>
           <Outlet />
         </div>
       </main>
