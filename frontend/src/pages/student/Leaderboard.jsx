@@ -101,6 +101,7 @@ export default function Leaderboard() {
         <div className="flex justify-center items-center h-64">
            <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
         </div>
+      ) : leaderboard.length === 0 ? (
         <div className="glass-panel border-white/10 p-12 rounded-2xl flex flex-col items-center justify-center text-center shadow-sm">
           <Trophy className="w-16 h-16 text-slate-700 mb-4" />
           <h3 className="text-xl font-bold text-slate-300 mb-2">No rankings yet</h3>

@@ -35,6 +35,9 @@ export default function StudentSettings() {
           </h1>
           <p className="text-slate-400 mt-2">Manage your profile and platform preferences.</p>
         </div>
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
           className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all disabled:opacity-50 shadow-[0_0_15px_rgba(79,70,229,0.3)] border border-indigo-500"
         >
           {isSaving ? (

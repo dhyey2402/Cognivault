@@ -270,12 +270,14 @@ export default function ActiveQuiz() {
                         key={option.id}
                         onClick={() => handleSelectOption(currentQuestion.id, option.id)}
                         className={`w-full text-left p-4 sm:p-5 rounded-2xl border-2 transition-all duration-200 flex items-center gap-4 group relative overflow-hidden ${
+                            isSelected 
                             ? 'border-indigo-500 bg-indigo-500/10' 
                             : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
                         } focus:outline-none focus:ring-4 focus:ring-indigo-500/20 active:scale-[0.99]`}
                       >
                         {/* Option Letter Badge */}
                         <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold transition-all duration-300 flex-shrink-0 relative ${
+                            isSelected 
                             ? 'bg-indigo-500 text-white shadow-md' 
                             : 'bg-white/10 text-slate-400 group-hover:bg-white/20 group-hover:text-white'
                         }`}>
